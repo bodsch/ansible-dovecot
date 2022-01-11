@@ -1,0 +1,11 @@
+---
+
+- name: install package
+  package:
+    name: "{{ dovecot_packages }}"
+    state: present
+  tags:
+    - dovecot
+    - dovecot_install
+
+...

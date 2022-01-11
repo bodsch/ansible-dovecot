@@ -1,0 +1,27 @@
+---
+
+dovecot_config:
+  listen:
+    - "127.0.0.1"
+
+dovecot_director:
+  director_services:
+    - director:
+        - listener: unix
+          type: login/director
+        - listener: unix
+          type: director-userdb
+        - listener: fifo
+          type: login/proxy-notify
+        - listener: inet
+
+    - logins:
+        - imap: {}
+        - pop3: {}
+        - submission: {}
+
+    - protocols:
+        - lmtp:
+            auth_socket_path: director-userdb
+
+...
