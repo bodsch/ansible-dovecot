@@ -21,6 +21,7 @@ class FilterModule(object):
         return {
             'compare_list': self.compare_list,
             'compare_dict': self.compare_dict,
+            'validate_attachment_hash': self.validate_attachment_hash,
         }
 
     def compare_list(self, data_list, compare_to_list):
@@ -28,14 +29,21 @@ class FilterModule(object):
         """
         display.v("compare_list({}, {})".format(data_list, compare_to_list))
 
-        result = list(
-            set(
-                sorted(data_list)).intersection(sorted(compare_to_list)
-            )
-        )
+        result = []
+
+        for i in data_list:
+            if i in compare_to_list:
+                result.append(i)
+
+        # randomized result :(
+        #result = list(
+        #    set(
+        #        data_list).intersection(sorted(compare_to_list)
+        #    )
+        #)
 
         display.v("return : {}".format(result))
-        return sorted(result)
+        return result
 
     def compare_dict(self, left_dict, right_dict):
         """
@@ -79,3 +87,19 @@ class FilterModule(object):
 
         # display.v("return : {}".format(result))
         return result
+
+    def validate_attachment_hash(self, data, compare_to_list):
+        """
+
+        """
+        display.v("validate_attachment_hash({}, {})".format(data, compare_to_list))
+
+        if ':' in data:
+            for i in compare_to_list:
+                if i[:-1] in data:
+                    return True
+        else:
+            if data in compare_to_list:
+                return True
+
+        return False

@@ -193,10 +193,10 @@ dovecot_defaults_mail:
       #separator: ""
       #prefix: ""
       #location: ""
-      inbox: yes
+      inbox: true
       #hidden: false
-      #list: yes
-      #subscriptions: yes
+      #list: true
+      #subscriptions: true
     - name: ""
       #type: shared
       #separator: /
@@ -214,58 +214,59 @@ dovecot_defaults_mail:
   #mail_server_comment: ""
   #mail_server_admin: ""
   #mmap_disable: false
-  #dotlock_use_excl: yes
+  #dotlock_use_excl: true
   #mail_fsync: optimized
   #lock_method: fcntl
   #mail_temp_dir: /tmp
-  #first_valid_uid: 500
-  #last_valid_uid: 0
-  #first_valid_gid: 1
-  #last_valid_gid: 0
+  first_valid_uid: 1101
+  last_valid_uid: 1101
+  first_valid_gid: 1101
+  last_valid_gid: 1101
   #mail_max_keyword_length: 50
-  #valid_chroot_dirs: ""
+  valid_chroot_dirs: []
   #mail_chroot: ""
   #auth_socket_path: /var/run/dovecot/auth-userdb
   #mail_plugin_dir: /usr/lib/dovecot/modules
-  #mail_plugins: ""
-  mailbox: {}
-    #mailbox_list_index: yes
-    #mailbox_list_index_very_dirty_syncs: yes
-    #mailbox_list_index_include_inbox: false
-    #mail_cache_min_mail_count: 0
-    #mailbox_idle_check_interval: 30 secs
-    #mail_save_crlf: false
-    #mail_prefetch_count: 0
-    #mail_temp_scan_interval: 1w
-    #mail_sort_max_read_count: 0
-    # protocol !indexer-worker {
-    #   #mail_vsize_bg_after_count: 0
-    # }
-  maildir: {}
-    #maildir_stat_dirs: false
-    #maildir_copy_with_hardlinks: yes
-    #maildir_very_dirty_syncs: false
-    #maildir_broken_filename_sizes: false
-    #maildir_empty_new: false
-  mbox: {}
-    #mbox_read_locks: fcntl
-    #mbox_write_locks: fcntl dotlock
-    #mbox_lock_timeout: 5 mins
-    #mbox_dotlock_change_timeout: 2 mins
-    #mbox_dirty_syncs: yes
-    #mbox_very_dirty_syncs: false
-    #mbox_lazy_writes: yes
-    #mbox_min_index_size: 0
-    #mbox_md5: apop3d
-    #mdbox_rotate_size: 10M
-    #mdbox_rotate_interval: 0
-    #mdbox_preallocate_space: false
-  attachment: {}
-    #mail_attachment_dir: ""
-    #mail_attachment_min_size: 128k
-    #mail_attachment_fs: sis posix
-    #mail_attachment_hash: %{sha1}
-    #mail_attachment_detection_options: ""
+  #mail_plugins: []
+  mailbox_list_index: true
+  #mailbox_list_index_very_dirty_syncs: true
+  #mailbox_list_index_include_inbox: false
+  mail_cache_min_mail_count: 0
+  #mailbox_idle_check_interval: 30 secs
+  #mail_save_crlf: false
+  #mail_prefetch_count: 0
+  #mail_temp_scan_interval: 1w
+  #mail_sort_max_read_count: 0
+  # protocol !indexer-worker {
+  #   #mail_vsize_bg_after_count: 0
+  # }
+
+  #maildir_stat_dirs: false
+  #maildir_copy_with_hardlinks: true
+  #maildir_very_dirty_syncs: false
+  #maildir_broken_filename_sizes: false
+  #maildir_empty_new: false
+
+  mbox_read_locks:
+    - fcntl
+  mbox_write_locks:
+    - fcntl
+    - dotlock
+  #mbox_lock_timeout: 5 mins
+  #mbox_dotlock_change_timeout: 2 mins
+  #mbox_dirty_syncs: true
+  #mbox_very_dirty_syncs: false
+  #mbox_lazy_writes: true
+  #mbox_min_index_size: 0
+  #mbox_md5: apop3d
+  #mdbox_rotate_size: 10M
+  #mdbox_rotate_interval: 0
+  #mdbox_preallocate_space: false
+  #mail_attachment_dir: ""
+  #mail_attachment_min_size: 128k
+  mail_attachment_fs: "sis posix"
+  mail_attachment_hash: "%{sha256:80}"
+  #mail_attachment_detection_options: ""
 
 dovecot_defaults_master:
   default_process_limit: 100
@@ -281,7 +282,7 @@ dovecot_defaults_master:
     #   }
     #   inet_listener imaps {...
     #     #port: 993
-    #     #ssl: yes
+    #     #ssl: true
     #   }
     #   #service_count: 1
     #   #process_min_avail: 0
@@ -305,7 +306,7 @@ dovecot_defaults_master:
     #   }
     #   inet_listener pop3s {
     #     #port: 995
-    #     #ssl: yes
+    #     #ssl: true
     #   }
     # }
     - pop3-login:
@@ -415,7 +416,7 @@ dovecot_defaults_ssl:
   key: ""
   #ssl_key_password: ""
   #ssl_ca: ""
-  #ssl_require_crl: yes
+  #ssl_require_crl: true
   ssl_client_ca_dir: /etc/ssl/certs
   #ssl_client_ca_file: ""
   #ssl_verify_client_cert: false
@@ -584,7 +585,7 @@ dovecot_defaults_submission:
   #submission_relay_master_user: ""
   #submission_relay_password: ""
   #submission_relay_ssl: false
-  #submission_relay_ssl_verify: yes
+  #submission_relay_ssl_verify: true
   #submission_relay_rawlog_dir: ""
   protocols:
     - submission:
