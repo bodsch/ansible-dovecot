@@ -43,6 +43,47 @@ mail_location                = {{ dovecot_mail.mail_location }}
 # namespaces you'll typically want to enable ACL plugin also, otherwise all
 # users can access all the shared mailboxes, assuming they have permissions
 # on filesystem level to do so.
+
+{% if dovecot_mail.namespaces is defined and
+      dovecot_mail.namespaces | count > 0 %}
+  {% for ns in dovecot_mail.namespaces %}
+namespace {{ ns.name }} {
+    {% if ns.type is defined and
+          ns.type | length > 0 and
+          ns.type in ['private', 'shared', 'public'] %}
+  type                  = {{ ns.type }}
+    {% endif %}
+    {% if ns.separator is defined and
+          ns.seperator | length > 0 %}
+  separator             = {{ ns.separator }}
+    {% endif %}
+    {% if ns.prefix is defined and
+          ns.prefix | length > 0 %}
+  prefix                = {{ ns.prefix }}
+    {% endif %}
+    {% if ns.location is defined and
+          ns.location | length > 0 %}
+  location              = {{ ns.location }}
+    {% endif %}
+    {% if ns.inbox is defined %}
+  inbox                 = {{ ns.inbox | bool | ternary('yes', 'no') }}
+    {% endif %}
+    {% if ns.hidden is defined %}
+  hidden                = {{ ns.hidden | bool | ternary('yes', 'no') }}
+    {% endif %}
+    {% if ns.list is defined and ns.list | type == "bool" %}
+  list                  = {{ ns.list | bool | ternary('yes', 'no') }}
+    {% elif ns.list is defined and ns.list | type == "str" and ns.list == "children" %}
+  list                  = children
+    {% endif %}
+    {% if ns.subscriptions is defined %}
+  subscriptions         = {{ ns.subscriptions | bool | ternary('yes', 'no') }}
+    {% endif %}
+}
+  {% endfor %}
+
+{% endif %}
+
 namespace inbox {
   # Namespace type: private, shared or public
   #type = private
