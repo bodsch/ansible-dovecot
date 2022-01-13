@@ -1,60 +1,23 @@
 #jinja2: trim_blocks: True, lstrip_blocks: True
 # {{ ansible_managed }}
 
-## Mailbox locations and namespaces
-##
-
-# Location for users' mailboxes. The default is empty, which means that Dovecot
-# tries to find the mailboxes automatically. This won't work if the user
-# doesn't yet have any mail, so you should explicitly tell Dovecot the full
-# location.
-#
-# If you're using mbox, giving a path to the INBOX file (eg. /var/mail/%u)
-# isn't enough. You'll also need to tell Dovecot where the other mailboxes are
-# kept. This is called the "root mail directory", and it must be the first
-# path given in the mail_location setting.
-#
-# There are a few special variables you can use, eg.:
-#
-#   %u - username
-#   %n - user part in user@domain, same as %u if there's no domain
-#   %d - domain part in user@domain, empty if there's no domain
-#   %h - home directory
-#
-# See doc/wiki/Variables.txt for full list. Some examples:
-#
-#   mail_location = maildir:~/Maildir
-#   mail_location = mbox:~/mail:INBOX=/var/mail/%u
-#   mail_location = mbox:/var/mail/%d/%1n/%n:INDEX=/var/indexes/%d/%1n/%n
-#
-# <doc/wiki/MailLocation.txt>
+{# Mailbox locations and namespaces #}
 {% if dovecot_mail.mail_location is defined and
       dovecot_mail.mail_location | length > 0 %}
 mail_location                = {{ dovecot_mail.mail_location }}
 {% endif %}
 
-# If you need to set multiple mailbox locations or want to change default
-# namespace settings, you can do it by defining namespace sections.
-#
-# You can have private, shared and public namespaces. Private namespaces
-# are for user's personal mails. Shared namespaces are for accessing other
-# users' mailboxes that have been shared. Public namespaces are for shared
-# mailboxes that are managed by sysadmin. If you create any shared or public
-# namespaces you'll typically want to enable ACL plugin also, otherwise all
-# users can access all the shared mailboxes, assuming they have permissions
-# on filesystem level to do so.
-
 {% if dovecot_mail.namespaces is defined and
       dovecot_mail.namespaces | count > 0 %}
   {% for ns in dovecot_mail.namespaces %}
-namespace {{ ns.name }} {
+namespace {{ ns.name | default("") }} {
     {% if ns.type is defined and
           ns.type | length > 0 and
           ns.type in ['private', 'shared', 'public'] %}
   type                  = {{ ns.type }}
     {% endif %}
     {% if ns.separator is defined and
-          ns.seperator | length > 0 %}
+          ns.separator | length > 0 %}
   separator             = {{ ns.separator }}
     {% endif %}
     {% if ns.prefix is defined and
@@ -79,186 +42,71 @@ namespace {{ ns.name }} {
     {% if ns.subscriptions is defined %}
   subscriptions         = {{ ns.subscriptions | bool | ternary('yes', 'no') }}
     {% endif %}
+    {% if ns.mail_location is defined and
+          ns.mail_location | length > 0 %}
+  mail_location         = {{ ns.mail_location }}
+    {% endif %}
 }
-  {% endfor %}
 
+  {% endfor %}
 {% endif %}
 
-namespace inbox {
-  # Namespace type: private, shared or public
-  #type = private
-
-  # Hierarchy separator to use. You should use the same separator for all
-  # namespaces or some clients get confused. '/' is usually a good one.
-  # The default however depends on the underlying mail storage format.
-  #separator =
-
-  # Prefix required to access this namespace. This needs to be different for
-  # all namespaces. For example "Public/".
-  #prefix =
-
-  # Physical location of the mailbox. This is in same format as
-  # mail_location, which is also the default for it.
-  #location =
-
-  # There can be only one INBOX, and this setting defines which namespace
-  # has it.
-  inbox = yes
-
-  # If namespace is hidden, it's not advertised to clients via NAMESPACE
-  # extension. You'll most likely also want to set list=no. This is mostly
-  # useful when converting from another server with different namespaces which
-  # you want to deprecate but still keep working. For example you can create
-  # hidden namespaces with prefixes "~/mail/", "~%u/mail/" and "mail/".
-  #hidden = no
-
-  # Show the mailboxes under this namespace with LIST command. This makes the
-  # namespace visible for clients that don't support NAMESPACE extension.
-  # "children" value lists child mailboxes, but hides the namespace prefix.
-  #list = yes
-
-  # Namespace handles its own subscriptions. If set to "no", the parent
-  # namespace handles them (empty prefix should always have this as "yes")
-  #subscriptions = yes
-
-  # See 15-mailboxes.conf for definitions of special mailboxes.
-}
-
-# Example shared namespace configuration
-#namespace {
-  #type = shared
-  #separator = /
-
-  # Mailboxes are visible under "shared/user@domain/"
-  # %%n, %%d and %%u are expanded to the destination user.
-  #prefix = shared/%%u/
-
-  # Mail location for other users' mailboxes. Note that %variables and ~/
-  # expands to the logged in user's data. %%n, %%d, %%u and %%h expand to the
-  # destination user's data.
-  #location = maildir:%%h/Maildir:INDEX=~/Maildir/shared/%%u
-
-  # Use the default namespace for saving subscriptions.
-  #subscriptions = no
-
-  # List the shared/ namespace only if there are visible shared mailboxes.
-  #list = children
-#}
-# Should shared INBOX be visible as "shared/user" or "shared/user/INBOX"?
 {% if dovecot_mail.mail_shared_explicit_inbox is defined %}
 mail_shared_explicit_inbox  = {{ dovecot_mail.mail_shared_explicit_inbox | bool | ternary('yes','no') }}
 {% endif %}
-
-# System user and group used to access mails. If you use multiple, userdb
-# can override these by returning uid or gid fields. You can use either numbers
-# or names. <doc/wiki/UserIds.txt>
 {% if dovecot_mail.mail_uid is defined and
-      dovecot_mail.mail_uid | length > 0 %}
-mail_uid                     = {{ dovecot_mail.mail_uid }}
+      dovecot_mail.mail_uid | string | length > 0 %}
+mail_uid                     = {{ dovecot_mail.mail_uid | int }}
 {% endif %}
 {% if dovecot_mail.mail_gid is defined and
-      dovecot_mail.mail_gid | length > 0 %}
-mail_gid                     = {{ dovecot_mail.mail_gid }}
+      dovecot_mail.mail_gid | string | length > 0 %}
+mail_gid                     = {{ dovecot_mail.mail_gid | int }}
 {% endif %}
-
-# Group to enable temporarily for privileged operations. Currently this is
-# used only with INBOX when either its initial creation or dotlocking fails.
-# Typically this is set to "mail" to give access to /var/mail.
 {% if dovecot_mail.mail_privileged_group is defined and
       dovecot_mail.mail_privileged_group | length > 0 %}
 mail_privileged_group        = {{ dovecot_mail.mail_privileged_group }}
 {% endif %}
-
-# Grant access to these supplementary groups for mail processes. Typically
-# these are used to set up access to shared mailboxes. Note that it may be
-# dangerous to set these if users can create symlinks (e.g. if "mail" group is
-# set here, ln -s /var/mail ~/mail/var could allow a user to delete others'
-# mailboxes, or ln -s /secret/shared/box ~/mail/mybox would allow reading it).
 {% if dovecot_mail.mail_access_groups is defined and
       dovecot_mail.mail_access_groups | length > 0 %}
 mail_access_groups           = {{ dovecot_mail.mail_access_groups }}
 {% endif %}
-
-# Allow full filesystem access to clients. There's no access checks other than
-# what the operating system does for the active UID/GID. It works with both
-# maildir and mboxes, allowing you to prefix mailboxes names with eg. /path/
-# or ~user/.
 {% if dovecot_mail.mail_access_groups is defined %}
 mail_full_filesystem_access  = {{ dovecot_mail.mail_access_groups | bool | ternary('yes','no') }}
 {% endif %}
-
-# Dictionary for key=value mailbox attributes. This is used for example by
-# URLAUTH and METADATA extensions.
 {% if dovecot_mail.mail_attribute_dict is defined and
       dovecot_mail.mail_attribute_dict | length > 0 %}
 mail_attribute_dict          = {{ dovecot_mail.mail_attribute_dict }}
 {% endif %}
-
-# A comment or note that is associated with the server. This value is
-# accessible for authenticated users through the IMAP METADATA server
-# entry "/shared/comment".
 {% if dovecot_mail.mail_server_comment is defined and
       dovecot_mail.mail_server_comment | length > 0 %}
 mail_server_comment          = "{{ dovecot_mail.mail_server_comment }}"
 {% endif %}
-
-# Indicates a method for contacting the server administrator. According to
-# RFC 5464, this value MUST be a URI (e.g., a mailto: or tel: URL), but that
-# is currently not enforced. Use for example mailto:admin@example.com. This
-# value is accessible for authenticated users through the IMAP METADATA server
-# entry "/shared/admin".
 {% if dovecot_mail.mail_server_admin is defined and
       dovecot_mail.mail_server_admin | length > 0 %}
 mail_server_admin            = {{ dovecot_mail.mail_server_admin }}
 {% endif %}
 
-##
-## Mail processes
-##
-
-# Don't use mmap() at all. This is required if you store indexes to shared
-# filesystems (NFS or clustered filesystem).
+{# Mail processes #}
 {% if dovecot_mail.mmap_disable is defined %}
 mmap_disable                 = {{ dovecot_mail.mmap_disable | bool | ternary('yes','no') }}
 {% endif %}
-# Rely on O_EXCL to work when creating dotlock files. NFS supports O_EXCL
-# since version 3, so this should be safe to use nowadays by default.
 {% if dovecot_mail.dotlock_use_excl is defined %}
 dotlock_use_excl             = {{ dovecot_mail.dotlock_use_excl | bool | ternary('yes','no') }}
 {% endif %}
-
-# When to use fsync() or fdatasync() calls:
-#   optimized (default): Whenever necessary to avoid losing important data
-#   always: Useful with e.g. NFS when write()s are delayed
-#   never: Never use it (best performance, but crashes can lose data)
 {% if dovecot_mail.mail_fsync is defined and
       dovecot_mail.mail_fsync | length > 0 and
       dovecot_mail.mail_fsync in ['optimized', 'always', 'never'] %}
 mail_fsync                   = {{ dovecot_mail.mail_fsync }}
 {% endif %}
-
-# Locking method for index files. Alternatives are fcntl, flock and dotlock.
-# Dotlocking uses some tricks which may create more disk I/O than other locking
-# methods. NFS users: flock doesn't work, remember to change mmap_disable.
 {% if dovecot_mail.lock_method is defined and
       dovecot_mail.lock_method | length > 0 and
       dovecot_mail.lock_method in ['fcntl', 'flock', 'dotlock'] %}
 lock_method                  = {{ dovecot_mail.lock_method }}
 {% endif %}
-
-# Directory where mails can be temporarily stored. Usually it's used only for
-# mails larger than >= 128 kB. It's used by various parts of Dovecot, for
-# example LDA/LMTP while delivering large mails or zlib plugin for keeping
-# uncompressed mails.
 {% if dovecot_mail.mail_temp_dir is defined and
       dovecot_mail.mail_temp_dir | length > 0 %}
 mail_temp_dir                = {{ dovecot_mail.mail_temp_dir }}
 {% endif %}
-
-# Valid UID range for users, defaults to 500 and above. This is mostly
-# to make sure that users can't log in as daemons or other system users.
-# Note that denying root logins is hardcoded to dovecot binary and can't
-# be done even if first_valid_uid is set to 0.
 {% if dovecot_mail.first_valid_uid is defined and
       dovecot_mail.first_valid_uid | int >= 500 %}
 first_valid_uid              = {{ dovecot_mail.first_valid_uid | int }}
@@ -267,11 +115,6 @@ first_valid_uid              = {{ dovecot_mail.first_valid_uid | int }}
       dovecot_mail.last_valid_uid | int %}
 last_valid_uid               = {{ dovecot_mail.last_valid_uid | int }}
 {% endif %}
-
-# Valid GID range for users, defaults to non-root/wheel. Users having
-# non-valid GID as primary group ID aren't allowed to log in. If user
-# belongs to supplementary groups with non-valid GIDs, those groups are
-# not set.
 {% if dovecot_mail.first_valid_gid is defined and
       dovecot_mail.first_valid_gid | int >= 500 %}
 first_valid_gid              = {{ dovecot_mail.first_valid_gid | int }}
@@ -280,204 +123,102 @@ first_valid_gid              = {{ dovecot_mail.first_valid_gid | int }}
       dovecot_mail.last_valid_gid | int %}
 last_valid_gid               = {{ dovecot_mail.last_valid_gid | int }}
 {% endif %}
-
-# Maximum allowed length for mail keyword name. It's only forced when trying
-# to create new keywords.
 {% if dovecot_mail.mail_max_keyword_length is defined and
       dovecot_mail.mail_max_keyword_length | int != 0 %}
 mail_max_keyword_length      = 50
 {% endif %}
-
-# ':' separated list of directories under which chrooting is allowed for mail
-# processes (ie. /var/mail will allow chrooting to /var/mail/foo/bar too).
-# This setting doesn't affect login_chroot, mail_chroot or auth chroot
-# settings. If this setting is empty, "/./" in home dirs are ignored.
-# WARNING: Never add directories here which local users can modify, that
-# may lead to root exploit. Usually this should be done only if you don't
-# allow shell access for users. <doc/wiki/Chrooting.txt>
-
 {% if dovecot_mail.valid_chroot_dirs is defined and
       dovecot_mail.valid_chroot_dirs | count > 0 %}
 valid_chroot_dirs            = {{ dovecot_mail.valid_chroot_dirs | join(':') }}
 {% endif %}
-
-# Default chroot directory for mail processes. This can be overridden for
-# specific users in user database by giving /./ in user's home directory
-# (eg. /home/./user chroots into /home). Note that usually there is no real
-# need to do chrooting, Dovecot doesn't allow users to access files outside
-# their mail directory anyway. If your home directories are prefixed with
-# the chroot directory, append "/." to mail_chroot. <doc/wiki/Chrooting.txt>
 {% if dovecot_mail.mail_chroot is defined and
       dovecot_mail.mail_chroot | length > 0 %}
 mail_chroot                  = {{ mail_chroot }}
 {% endif %}
-
-# UNIX socket path to master authentication server to find users.
-# This is used by imap (for shared users) and lda.
 {% if dovecot_mail.auth_socket_path is defined and
       dovecot_mail.auth_socket_path | length > 0 %}
 auth_socket_path             = {{ dovecot_mail.auth_socket_path }}
 {% endif %}
-
-# Directory where to look up mail plugins.
 {% if dovecot_mail.mail_plugin_dir is defined and
       dovecot_mail.mail_plugin_dir | length > 0 %}
 mail_plugin_dir              = {{ dovecot_mail.mail_plugin_dir }}
 {% endif %}
-
-# Space separated list of plugins to load for all services. Plugins specific to
-# IMAP, LDA, etc. are added to this list in their own .conf files.
 {% if dovecot_mail.mail_plugins is defined and
       dovecot_mail.mail_plugins | count > 0 %}
 mail_plugins                 = {{ dovecot_mail.mail_plugins | join(' ') }}
 {% endif %}
 
-##
-## Mailbox handling optimizations
-##
-
-# Mailbox list indexes can be used to optimize IMAP STATUS commands. They are
-# also required for IMAP NOTIFY extension to be enabled.
+{# Mailbox handling optimizations #}
 {% if dovecot_mail.mailbox_list_index is defined %}
 mailbox_list_index           = {{ dovecot_mail.mailbox_list_index | bool | ternary('yes','no') }}
 {% endif %}
-
-# Trust mailbox list index to be up-to-date. This reduces disk I/O at the cost
-# of potentially returning out-of-date results after e.g. server crashes.
-# The results will be automatically fixed once the folders are opened.
 {% if dovecot_mail.mailbox_list_index_very_dirty_syncs is defined %}
 mailbox_list_index_very_dirty_syncs = {{ dovecot_mail.mailbox_list_index_very_dirty_syncs | bool | ternary('yes','no') }}
 {% endif %}
-
-# Should INBOX be kept up-to-date in the mailbox list index? By default it's
-# not, because most of the mailbox accesses will open INBOX anyway.
 {% if dovecot_mail.mailbox_list_index_include_inbox is defined %}
 mailbox_list_index_include_inbox = {{ dovecot_mail.mailbox_list_index_include_inbox | bool | ternary('yes','no') }}
 {% endif %}
-
-# The minimum number of mails in a mailbox before updates are done to cache
-# file. This allows optimizing Dovecot's behavior to do less disk writes at
-# the cost of more disk reads.
 {% if dovecot_mail.mail_cache_min_mail_count is defined and
       dovecot_mail.mail_cache_min_mail_count | string | length > 0 %}
 mail_cache_min_mail_count    = {{ dovecot_mail.mail_cache_min_mail_count | int }}
 {% endif %}
-
-# When IDLE command is running, mailbox is checked once in a while to see if
-# there are any new mails or other changes. This setting defines the minimum
-# time to wait between those checks. Dovecot can also use inotify and
-# kqueue to find out immediately when changes occur.
 {% if dovecot_mail.mailbox_idle_check_interval is defined and
       dovecot_mail.mailbox_idle_check_interval | length > 0 %}
 mailbox_idle_check_interval  = {{ dovecot_mail.mailbox_idle_check_interval }}
 {% endif %}
-
-# Save mails with CR+LF instead of plain LF. This makes sending those mails
-# take less CPU, especially with sendfile() syscall with Linux and FreeBSD.
-# But it also creates a bit more disk I/O which may just make it slower.
-# Also note that if other software reads the mboxes/maildirs, they may handle
-# the extra CRs wrong and cause problems.
 {% if dovecot_mail.mail_save_crlf is defined %}
 mail_save_crlf               = {{ dovecot_mail.mail_save_crlf | bool | ternary('yes','no') }}
 {% endif %}
-
-# Max number of mails to keep open and prefetch to memory. This only works with
-# some mailbox formats and/or operating systems.
 {% if dovecot_mail.mail_prefetch_count is defined and
       dovecot_mail.mail_prefetch_count | string | length > 0 %}
 mail_prefetch_count          = {{ dovecot_mail.mail_prefetch_count | int }}
 {% endif %}
-
-# How often to scan for stale temporary files and delete them (0 = never).
-# These should exist only after Dovecot dies in the middle of saving mails.
 {% if dovecot_mail.mail_temp_scan_interval is defined and
       dovecot_mail.mail_temp_scan_interval | length > 0 %}
 mail_temp_scan_interval      = {{ dovecot_mail.mail_temp_scan_interval }}
 {% endif %}
-
-# How many slow mail accesses sorting can perform before it returns failure.
-# With IMAP the reply is: NO [LIMIT] Requested sort would have taken too long.
-# The untagged SORT reply is still returned, but it's likely not correct.
 {% if dovecot_mail.mail_sort_max_read_count is defined and
       dovecot_mail.mail_sort_max_read_count | string | length > 0 %}
 mail_sort_max_read_count     = {{ dovecot_mail.mail_sort_max_read_count | int }}
 {% endif %}
 
-protocol !indexer-worker {
-  # If folder vsize calculation requires opening more than this many mails from
-  # disk (i.e. mail sizes aren't in cache already), return failure and finish
-  # the calculation via indexer process. Disabled by default. This setting must
-  # be 0 for indexer-worker processes.
-  #mail_vsize_bg_after_count = 0
+{% if dovecot_mail.mail_protocols is defined and
+      dovecot_mail.mail_protocols | count > 0 %}
+  {% for pr in dovecot_mail.mail_protocols %}
+    {% if pr.name is defined %}
+      {% set _name = pr. name %}
+      {% set _ = pr.pop('name') %}
+protocol {{ _name }} {
+      {% for k,v in pr.items() %}
+  {{ k }} = {{ v }}
+      {% endfor %}
 }
+    {% endif %}
+  {% endfor %}
 
-##
-## Maildir-specific settings
-##
+{% endif %}
 
-# By default LIST command returns all entries in maildir beginning with a dot.
-# Enabling this option makes Dovecot return only entries which are directories.
-# This is done by stat()ing each entry, so it causes more disk I/O.
-# (For systems setting struct dirent->d_type, this check is free and it's
-# done always regardless of this setting)
+{# Maildir-specific settings #}
 {% if dovecot_mail.maildir_stat_dirs is defined %}
 maildir_stat_dirs            = {{ dovecot_mail.maildir_stat_dirs | bool | ternary('yes','no') }}
 {% endif %}
-
-# When copying a message, do it with hard links whenever possible. This makes
-# the performance much better, and it's unlikely to have any side effects.
 {% if dovecot_mail.maildir_copy_with_hardlinks is defined %}
 maildir_copy_with_hardlinks  = {{ dovecot_mail.maildir_copy_with_hardlinks | bool | ternary('yes','no') }}
 {% endif %}
-
-# Assume Dovecot is the only MUA accessing Maildir: Scan cur/ directory only
-# when its mtime changes unexpectedly or when we can't find the mail otherwise.
 {% if dovecot_mail.maildir_very_dirty_syncs is defined %}
 maildir_very_dirty_syncs     = {{ dovecot_mail.maildir_very_dirty_syncs | bool | ternary('yes','no') }}
 {% endif %}
-
-# If enabled, Dovecot doesn't use the S=<size> in the Maildir filenames for
-# getting the mail's physical size, except when recalculating Maildir++ quota.
-# This can be useful in systems where a lot of the Maildir filenames have a
-# broken size. The performance hit for enabling this is very small.
 {% if dovecot_mail.maildir_broken_filename_sizes is defined %}
 maildir_broken_filename_sizes = {{ dovecot_mail.maildir_broken_filename_sizes | bool | ternary('yes','no') }}
 {% endif %}
-
-# Always move mails from new/ directory to cur/, even when the \Recent flags
-# aren't being reset.
 {% if dovecot_mail.maildir_empty_new is defined %}
 maildir_empty_new            = {{ dovecot_mail.maildir_empty_new | bool | ternary('yes','no') }}
 {% endif %}
 
-##
-## mbox-specific settings
-##
-
-# Which locking methods to use for locking mbox. There are four available:
-#  dotlock: Create <mailbox>.lock file. This is the oldest and most NFS-safe
-#           solution. If you want to use /var/mail/ like directory, the users
-#           will need write access to that directory.
-#  dotlock_try: Same as dotlock, but if it fails because of permissions or
-#               because there isn't enough disk space, just skip it.
-#  fcntl  : Use this if possible. Works with NFS too if lockd is used.
-#  flock  : May not exist in all systems. Doesn't work with NFS.
-#  lockf  : May not exist in all systems. Doesn't work with NFS.
-#
-# You can use multiple locking methods; if you do the order they're declared
-# in is important to avoid deadlocks if other MTAs/MUAs are using multiple
-# locking methods as well. Some operating systems don't allow using some of
-# them simultaneously.
-#
-# The Debian value for mbox_write_locks differs from upstream Dovecot. It is
-# changed to be compliant with Debian Policy (section 11.6) for NFS safety.
-#       Dovecot: mbox_write_locks = dotlock fcntl
-#       Debian:  mbox_write_locks = fcntl dotlock
-
+{# mbox-specific settings #}
 {% if dovecot_mail.mbox_read_locks is defined and
       dovecot_mail.mbox_read_locks | length > 0 %}
   {% set _attr = ['fcntl', 'flock', 'dotlock', 'dotlock_try', 'lockf'] %}
-
 mbox_read_locks              = {{ dovecot_mail.mbox_read_locks | compare_list(_attr) | join(' ') }}
 {% endif %}
 {% if dovecot_mail.mbox_write_locks is defined and
@@ -485,121 +226,59 @@ mbox_read_locks              = {{ dovecot_mail.mbox_read_locks | compare_list(_a
   {% set _attr = ['fcntl', 'flock', 'dotlock', 'dotlock_try', 'lockf'] %}
 mbox_write_locks             = {{ dovecot_mail.mbox_write_locks | compare_list(_attr) | join(' ') }}
 {% endif %}
-
-# Maximum time to wait for lock (all of them) before aborting.
 {% if dovecot_mail.mbox_lock_timeout is defined and
       dovecot_mail.mbox_lock_timeout | length > 0 %}
 mbox_lock_timeout            = {{ dovecot_mail.mbox_lock_timeout }}
 {% endif %}
-
-# If dotlock exists but the mailbox isn't modified in any way, override the
-# lock file after this much time.
 {% if dovecot_mail.mbox_dotlock_change_timeout is defined and
       dovecot_mail.mbox_dotlock_change_timeout | length > 0 %}
 mbox_dotlock_change_timeout  = {{ dovecot_mail.mbox_dotlock_change_timeout }}
 {% endif %}
-
-# When mbox changes unexpectedly we have to fully read it to find out what
-# changed. If the mbox is large this can take a long time. Since the change
-# is usually just a newly appended mail, it'd be faster to simply read the
-# new mails. If this setting is enabled, Dovecot does this but still safely
-# fallbacks to re-reading the whole mbox file whenever something in mbox isn't
-# how it's expected to be. The only real downside to this setting is that if
-# some other MUA changes message flags, Dovecot doesn't notice it immediately.
-# Note that a full sync is done with SELECT, EXAMINE, EXPUNGE and CHECK
-# commands.
 {% if dovecot_mail.mbox_dirty_syncs is defined %}
 mbox_dirty_syncs             = {{ dovecot_mail.mbox_dirty_syncs | bool | ternary('yes','no') }}
 {% endif %}
-
-# Like mbox_dirty_syncs, but don't do full syncs even with SELECT, EXAMINE,
-# EXPUNGE or CHECK commands. If this is set, mbox_dirty_syncs is ignored.
 {% if dovecot_mail.mbox_dirty_syncs is defined %}
 mbox_very_dirty_syncs        = {{ dovecot_mail.mbox_very_dirty_syncs | bool | ternary('yes','no') }}
 {% endif %}
-
-# Delay writing mbox headers until doing a full write sync (EXPUNGE and CHECK
-# commands and when closing the mailbox). This is especially useful for POP3
-# where clients often delete all mails. The downside is that our changes
-# aren't immediately visible to other MUAs.
 {% if dovecot_mail.mbox_dirty_syncs is defined %}
 mbox_lazy_writes             = {{ dovecot_mail.mbox_lazy_writes | bool | ternary('yes','no') }}
 {% endif %}
-
-# If mbox size is smaller than this (e.g. 100k), don't write index files.
-# If an index file already exists it's still read, just not updated.
 {% if dovecot_mail.mbox_min_index_size is defined and
       dovecot_mail.mbox_min_index_size | string | length > 0 %}
 mbox_min_index_size          = {{ dovecot_mail.mbox_min_index_size | int }}
 {% endif %}
-
-# Mail header selection algorithm to use for MD5 POP3 UIDLs when
-# pop3_uidl_format=%m. For backwards compatibility we use apop3d inspired
-# algorithm, but it fails if the first Received: header isn't unique in all
-# mails. An alternative algorithm is "all" that selects all headers.
 {% if dovecot_mail.mbox_md5 is defined and
       dovecot_mail.mbox_md5 | length > 0 %}
 mbox_md5                     = {{ dovecot_mail.mbox_md5 }}
 {% endif %}
 
-##
-## mdbox-specific settings
-##
-
-# Maximum dbox file size until it's rotated.
+{# mdbox-specific settings #}
 {% if dovecot_mail.mdbox_rotate_size is defined and
       dovecot_mail.mdbox_rotate_size | length > 0 %}
 mdbox_rotate_size            = {{ dovecot_mail.mdbox_rotate_size }}
 {% endif %}
-
-# Maximum dbox file age until it's rotated. Typically in days. Day begins
-# from midnight, so 1d = today, 2d = yesterday, etc. 0 = check disabled.
 {% if dovecot_mail.mdbox_rotate_interval is defined and
       dovecot_mail.mdbox_rotate_interval | string | length > 0 %}
 mdbox_rotate_interval        = {{ dovecot_mail.mbox_min_index_size }}
 {% endif %}
-
-# When creating new mdbox files, immediately preallocate their size to
-# mdbox_rotate_size. This setting currently works only in Linux with some
-# filesystems (ext4, xfs).
 {% if dovecot_mail.mdbox_preallocate_space is defined %}
 mdbox_preallocate_space      = {{ dovecot_mail.mdbox_preallocate_space | bool | ternary('yes','no') }}
 {% endif %}
 
-##
-## Mail attachments
-##
-
-# sdbox and mdbox support saving mail attachments to external files, which
-# also allows single instance storage for them. Other backends don't support
-# this for now.
-
-# Directory root where to store mail attachments. Disabled, if empty.
+{# Mail attachments #}
 {% if dovecot_mail.mail_attachment_dir is defined and
       dovecot_mail.mail_attachment_dir | length > 0 %}
 mail_attachment_dir          = {{ dovecot_mail.mail_attachment_dir }}
 {% endif %}
-
-# Attachments smaller than this aren't saved externally. It's also possible to
-# write a plugin to disable saving specific attachments externally.
 {% if dovecot_mail.mail_attachment_min_size is defined and
       dovecot_mail.mail_attachment_min_size | length > 0 %}
 mail_attachment_min_size     = {{ dovecot_mail.mail_attachment_min_size }}
 {% endif %}
-
-# Filesystem backend to use for saving attachments:
-#  posix : No SiS done by Dovecot (but this might help FS's own deduplication)
-#  sis posix : SiS with immediate byte-by-byte comparison during saving
-#  sis-queue posix : SiS with delayed comparison and deduplication
 {% if dovecot_mail.mail_attachment_fs is defined and
       dovecot_mail.mail_attachment_fs | length > 0 and
       dovecot_mail.mail_attachment_fs in ['posix', 'sis posix', 'sis-queue posix'] %}
 mail_attachment_fs           = {{ dovecot_mail.mail_attachment_fs }}
 {% endif %}
-
-# Hash format to use in attachment filenames. You can add any text and
-# variables: %{md4}, %{md5}, %{sha1}, %{sha256}, %{sha512}, %{size}.
-# Variables can be truncated, e.g. %{sha256:80} returns only first 80 bits
 {% if dovecot_mail.mail_attachment_hash is defined and
       dovecot_mail.mail_attachment_hash | length > 0 %}
   {% if dovecot_mail.mail_attachment_hash.startswith("%{") %}
@@ -614,17 +293,7 @@ mail_attachment_fs           = {{ dovecot_mail.mail_attachment_fs }}
 mail_attachment_hash         = {{ _mail_attachment_hash }}
   {% endif %}
 {% endif %}
-
-# Settings to control adding $HasAttachment or $HasNoAttachment keywords.
-# By default, all MIME parts with Content-Disposition=attachment, or inlines
-# with filename parameter are consired attachments.
-#   add-flags-on-save - Add the keywords when saving new mails.
-#   content-type=type or !type - Include/exclude content type. Excluding will
-#     never consider the matched MIME part as attachment. Including will only
-#     negate an exclusion (e.g. content-type=!foo/* content-type=foo/bar).
-#   exclude-inlined - Exclude any Content-Disposition=inline MIME part.
 {% if dovecot_mail.mail_attachment_detection_options is defined and
       dovecot_mail.mail_attachment_detection_options | length > 0 %}
 mail_attachment_detection_options = {{ dovecot_mail.mail_attachment_detection_options }}
 {% endif %}
-

@@ -1,5 +1,7 @@
 ---
 
+dovecot_logging_directory: /var/log/dovecot
+
 # dovecot_hostname: "{{ ansible_fqdn }}"
 
 # dovecot_default_mysql:

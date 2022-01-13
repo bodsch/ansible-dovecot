@@ -1,5 +1,11 @@
 ---
 
+- name: create logging directory
+  file:
+    state: directory
+    path: "{{ dovecot_logging_directory }}"
+    mode: 0755
+
 - name: create dovecot.conf
   template:
     src: etc/dovecot/dovecot.conf.j2
@@ -18,5 +24,6 @@
     - 10-director.conf
     - 10-logging.conf
     - 10-mail.conf
+    - 10-master.conf
 
 ...

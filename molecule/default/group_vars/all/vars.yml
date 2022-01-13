@@ -24,4 +24,32 @@ dovecot_director:
         - lmtp:
             auth_socket_path: director-userdb
 
+dovecot_mail:
+  namespaces:
+    - type: private
+      name: inbox
+      separator: "."
+      prefix: INBOX.
+      inbox: true
+      list: true
+      subscriptions: true
+      location: "maildir:%h:INDEX=/srv/mail/INDEX/%d/%n:CONTROL=/srv/mail/CONTROL/%d/%n:LAYOUT=maildir++"
+
+    - type: public
+      separator: "."
+      prefix: shared.
+      location: "maildir:/srv/mail/PUBLIC:INDEX=/srv/mail/PUBLIC/indexes:CONTROL=/srv/mail/PUBLIC/control:LAYOUT=maildir++"
+      list: children
+      subscriptions: true
+
+  mail_uid: 1101
+  mail_gid: 1101
+  first_valid_uid: 1101
+  last_valid_uid: 1101
+  first_valid_gid: 1101
+  last_valid_gid: 1101
+
+  mail_attachment_fs: sis-queue posix
+  mail_attachment_hash: "%{sha1:120}"
+
 ...

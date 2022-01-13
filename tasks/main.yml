@@ -3,8 +3,8 @@
 - name: prepare
   include_tasks: prepare.yml
 
-#- name: install
-#  include_tasks: install.yml
+- name: install
+  include_tasks: install.yml
 
 - name: configure
   include_tasks: configure.yml

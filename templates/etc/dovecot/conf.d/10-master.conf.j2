@@ -1,18 +1,59 @@
-#default_process_limit = 100
-#default_client_limit = 1000
+#jinja2: trim_blocks: True, lstrip_blocks: True
+# {{ ansible_managed }}
 
-# Default VSZ (virtual memory size) limit for service processes. This is mainly
-# intended to catch and kill processes that leak memory before they eat up
-# everything.
-#default_vsz_limit = 256M
+{% if dovecot_master.default_process_limit is defined and
+      dovecot_master.default_process_limit | string | length > 0 %}
+default_process_limit        = {{ dovecot_master.default_process_limit | int }}
+{% endif %}
+{% if dovecot_master.default_client_limit is defined and
+      dovecot_master.default_client_limit | string | length > 0 %}
+default_client_limit         = {{ dovecot_master.default_client_limit | int }}
+{% endif %}
+{% if dovecot_master.default_vsz_limit is defined and
+      dovecot_master.default_vsz_limit | string | length > 0 %}
+default_vsz_limit            = {{ dovecot_master.default_vsz_limit }}
+{% endif %}
+{% if dovecot_master.default_login_user is defined and
+      dovecot_master.default_login_user | string | length > 0 %}
+default_login_user           = {{ dovecot_master.default_login_user }}
+{% endif %}
+{% if dovecot_master.default_internal_user is defined and
+      dovecot_master.default_internal_user | string | length > 0 %}
+default_internal_user        = {{ dovecot_master.default_internal_user }}
+{% endif %}
 
-# Login user is internally used by login processes. This is the most untrusted
-# user in Dovecot system. It shouldn't have access to anything at all.
-#default_login_user = dovenull
+{% if dovecot_master.services is defined and dovecot_master.services | count > 0 %}
+  {% for service in dovecot_master.services %}
+    {% for key, values in service.items() %}
+service {{ key }} {
+      {% for k, v in values.items() %}
+        {% if k == "listeners" and v | type == "list" %}
+          {% for x in v %}
+            {% set _key = x.keys() | first %}
+            {% set _values = x.values() | first %}
+            {% if _values.type is defined %}
+              {% set _type = _values.type %}
+              {% set _ = _values.pop('type') %}
+            {% else %}
+              {% set _type = "inet" %}
+            {% endif %}
+  {{ _type }}_listener {{ _key }} {
+              {% for kk,vv in _values.items() %}
+                {% if vv | string | length > 0 %}
+    {{ "%-24s" |format(kk) }} = {{ vv }}
+                {% endif %}
+              {% endfor %}
+  }
+          {% endfor %}
+        {% else %}
+  {{ "%-26s" |format(k) }} = {{ v }}
+        {% endif %}
+      {% endfor %}
+}
 
-# Internal user is used by unprivileged processes. It should be separate from
-# login user, so that login processes can't disturb other processes.
-#default_internal_user = dovecot
+    {% endfor %}
+  {% endfor %}
+{% else %}
 
 service imap-login {
   inet_listener imap {
@@ -60,7 +101,7 @@ service lmtp {
   #inet_listener lmtp {
     # Avoid making LMTP visible for the entire internet
     #address =
-    #port = 
+    #port =
   #}
 }
 
@@ -99,8 +140,8 @@ service auth {
   # permissions (e.g. 0777 allows everyone full permissions).
   unix_listener auth-userdb {
     #mode = 0666
-    #user = 
-    #group = 
+    #user =
+    #group =
   }
 
   # Postfix smtp-auth
@@ -124,7 +165,8 @@ service dict {
   # For example: mode=0660, group=vmail and global mail_access_groups=vmail
   unix_listener dict {
     #mode = 0600
-    #user = 
-    #group = 
+    #user =
+    #group =
   }
 }
+{% endif %}
