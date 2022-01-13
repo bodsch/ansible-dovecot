@@ -39,14 +39,16 @@ service {{ key }} {
             {% endif %}
   {{ _type }}_listener {{ _key }} {
               {% for kk,vv in _values.items() %}
-                {% if vv | string | length > 0 %}
-    {{ "%-24s" |format(kk) }} = {{ vv }}
+                {% if vv | string | length > 0 and vv | config_value %}
+    {{ "%-24s" | format(kk) }} = {{ vv | config_value }}
                 {% endif %}
               {% endfor %}
   }
           {% endfor %}
         {% else %}
-  {{ "%-26s" |format(k) }} = {{ v }}
+          {% if v | string | length > 0 and v | config_value %}
+  {{ "%-26s" | format(k) }} = {{ v | config_value }}
+          {% endif %}
         {% endif %}
       {% endfor %}
 }

@@ -291,6 +291,51 @@ dovecot_defaults_master:
   default_internal_user: dovecot
 
   services:
+    # service log {
+    #   chroot =
+    #   client_limit = 0
+    #   drop_priv_before_exec = no
+    #   executable = log
+    #   extra_groups =
+    #   group =
+    #   idle_kill = 4294967295 secs
+    #   privileged_group =
+    #   process_limit = 1
+    #   process_min_avail = 0
+    #   protocol =
+    #   service_count = 0
+    #   type = log
+    #   unix_listener log-errors {
+    #     group =
+    #     mode = 0600
+    #     user =
+    #   }
+    #   user =
+    #   vsz_limit = 18446744073709551615 B
+    # }
+    - log:
+        chroot: ""
+        client_limit: 0
+        drop_priv_before_exec: false
+        executable: log
+        extra_groups:
+        user:
+        group:
+        idle_kill: "4294967295 secs"
+        privileged_group:
+        process_limit: 1
+        process_min_avail: 0
+        protocol:
+        service_count: 0
+        type: log
+        vsz_limit:
+        listeners:
+          - log-errors:
+              type: unix
+              group:
+              user:
+              mode: "0600"
+
     # service imap-login {
     #   inet_listener imap {
     #     #port: 143
@@ -306,7 +351,7 @@ dovecot_defaults_master:
     - imap-login:
         service_count: 1
         process_min_avail: 0
-        vsz_limit: "$default_vsz_limit"
+        # vsz_limit: "$default_vsz_limit"
         listeners:
           - imap:
               type: "inet"
@@ -357,6 +402,9 @@ dovecot_defaults_master:
               type: inet
               address: 127.0.0.1
               port: 999
+              haproxy: false
+              reuse_port: false
+              ssl: false
           - lmtp:
               type: unix
               mode: "0666"
