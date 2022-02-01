@@ -504,30 +504,29 @@ dovecot_defaults_tcpwrapper:
   #}
   services:
     - login/tcpwrap:
-        type: unix
-        mode: 0666
-        user: ""
-        group: ""
+        listeners:
+          - login/tcpwrap:
+              type: "unix"
+              mode: 0666
+              user: ""
+              group: ""
 
 dovecot_defaults_lda:
-  #postmaster_address: ""
-  #hostname: ""
-  #quota_full_tempfail: false
-  #sendmail_path: /usr/sbin/sendmail
-  #submission_host: ""
-  #rejection_subject: Rejected: %s
-  #rejection_reason: "Your message to <%t> was automatically rejected:%n%r"
-  #recipient_delimiter: "+"
-  #lda_original_recipient_header: ""
-  #lda_mailbox_autocreate: false
-  #lda_mailbox_autosubscribe: false
-  #protocol lda {
-  # # Space separated list of plugins to load (default is global mail_plugins).
-  # #mail_plugins: $mail_plugins
-  #}
+  # postmaster_address: ""
+  # hostname: ""
+  # quota_full_tempfail: false
+  # sendmail_path: /usr/sbin/sendmail
+  # submission_host: ""
+  # rejection_subject: Rejected: %s
+  # rejection_reason: "Your message to <%t> was automatically rejected:%n%r"
+  # recipient_delimiter: "+"
+  # original_recipient_header: ""
+  # mailbox_autocreate: false
+  # mailbox_autosubscribe: false
   protocols:
     - lda:
-        mail_plugins: "$mail_plugins"
+        mail_plugins:
+          - "$mail_plugins"
 
 dovecot_defaults_mailboxes:
   namespaces:

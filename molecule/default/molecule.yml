@@ -34,10 +34,10 @@ provisioner:
 
 scenario:
   test_sequence:
-    - lint
+    # - lint
     - destroy
     - dependency
-    - syntax
+    # - syntax
     - create
     - prepare
     - converge
