@@ -4,26 +4,6 @@ dovecot_config:
   listen:
     - "127.0.0.1"
 
-dovecot_director:
-  director_services:
-    - director:
-        - listener: unix
-          type: login/director
-        - listener: unix
-          type: director-userdb
-        - listener: fifo
-          type: login/proxy-notify
-        - listener: inet
-
-    - logins:
-        - imap: {}
-        - pop3: {}
-        - submission: {}
-
-    - protocols:
-        - lmtp:
-            auth_socket_path: director-userdb
-
 dovecot_mail:
   namespaces:
     - type: private
@@ -52,78 +32,14 @@ dovecot_mail:
   mail_attachment_fs: sis-queue posix
   mail_attachment_hash: "%{sha1:120}"
 
-dovecot_ssl:
-  enabled: true
-  cert: "/etc/dovecot/private/dovecot.pem"
-  key: "/etc/dovecot/private/dovecot.key"
-  #key_password: ""
-  #ca: ""
-  #require_crl: true
-  client_ca_dir: /etc/ssl/certs
-  #client_ca_file: ""
-  #verify_client_cert: false
-  #cert_username_field: commonName
-  # Generate new params with `openssl dhparam -out /etc/dovecot/dh.pem 4096`
-  dh: "/usr/share/dovecot/dh.pem"
-  min_protocol: TLSv1.2
-  cipher_list:
-    - ALL
-    - "!DH"
-    - "!kRSA"
-    - "!SRP"
-    - "!kDHd"
-    - "!DSS"
-    - "!aNULL"
-    - "!eNULL"
-    - "!EXPORT"
-    - "!DES"
-    - "!3DES"
-    - "!MD5"
-    - "!PSK"
-    - "!RC4"
-    - "!ADH"
-    - "!LOW@STRENGTH"
-  curve_list:
-    - P-521
-    - P-384
-    - P-256
-  #prefer_server_ciphers: false
-  # for valid values run "openssl engine"
-  #crypto_device: ""
-  #options: ""
-
-dovecot_tcpwrapper:
-  login_access_sockets: tcpwrap
-  services:
-    - login/tcpwrap:
-        listeners:
-          - login/tcpwrap:
-              type: "unix"
-              mode: "0666"
-              user: ""
-              group: ""
-
-dovecot_lda:
-  #postmaster_address: ""
-  #hostname: ""
-  #quota_full_tempfail: false
-  #sendmail_path: /usr/sbin/sendmail
-  #submission_host: ""
-  #rejection_subject: Rejected: %s
-  # You can use variables:
-  #   %n = CRLF, %r = reason, %s = original subject, %t = recipient
-  #rejection_reason: "Your message to <%t> was automatically rejected:%n%r"
-  #recipient_delimiter: "+"
-  #original_recipient_header: ""
-  #mailbox_autocreate: false
-  #mailbox_autosubscribe: false
-  #protocol lda {
-  # # Space separated list of plugins to load (default is global mail_plugins).
-  # #mail_plugins: $mail_plugins
-  #}
+dovecot_lmtp:
+  #lmtp_proxy: false
+  #lmtp_save_to_detail_mailbox: false
+  #lmtp_rcpt_check_quota: false
+  #lmtp_hdr_delivery_address: final
   protocols:
-    - lda:
-        mail_plugins:
-          - "$mail_plugins"
+    - lmtp: {}
+        # mail_plugins: $mail_plugins
+
 
 ...

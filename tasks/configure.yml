@@ -28,5 +28,8 @@
     # - 10-ssl.conf
     # - 10-tcpwrapper.conf
     # - 15-lda.conf
-    - 15-mailboxes.conf
+    # - 15-mailboxes.conf
+    # - 20-imap.conf
+    - 20-lmtp.conf
+
 ...

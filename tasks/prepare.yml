@@ -83,20 +83,20 @@
 #     dovecot_lda: "{{ dovecot_defaults_lda |
 #       combine( dovecot_lda, recursive=True ) }}"
 
-- name: merge dovecot mailboxes configuration between defaults and custom
-  set_fact:
-    dovecot_mailboxes: "{{ dovecot_defaults_mailboxes |
-      combine( dovecot_mailboxes, recursive=True ) }}"
-
-- name: merge dovecot imap configuration between defaults and custom
-  set_fact:
-    dovecot_imap: "{{ dovecot_defaults_imap |
-      combine( dovecot_imap, recursive=True ) }}"
-
-# - name: merge dovecot lmtp configuration between defaults and custom
+# - name: merge dovecot mailboxes configuration between defaults and custom
 #   set_fact:
-#     dovecot_lmtp: "{{ dovecot_defaults_lmtp |
-#       combine( dovecot_lmtp, recursive=True ) }}"
+#     dovecot_mailboxes: "{{ dovecot_defaults_mailboxes |
+#       combine( dovecot_mailboxes, recursive=True ) }}"
+
+# - name: merge dovecot imap configuration between defaults and custom
+#   set_fact:
+#     dovecot_imap: "{{ dovecot_defaults_imap |
+#       combine( dovecot_imap, recursive=True ) }}"
+
+- name: merge dovecot lmtp configuration between defaults and custom
+  set_fact:
+    dovecot_lmtp: "{{ dovecot_defaults_lmtp |
+      combine( dovecot_lmtp, recursive=True ) }}"
 #
 # - name: merge dovecot managesieve configuration between defaults and custom
 #   set_fact:
