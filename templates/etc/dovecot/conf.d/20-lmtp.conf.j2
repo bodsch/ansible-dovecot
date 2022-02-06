@@ -1,25 +1,36 @@
 #jinja2: trim_blocks: True, lstrip_blocks: True
 # {{ ansible_managed }}
 
-# Support proxying to other LMTP/SMTP servers by performing passdb lookups.
-#lmtp_proxy = no
-
-# When recipient address includes the detail (e.g. user+detail), try to save
-# the mail to the detail mailbox. See also recipient_delimiter and
-# lda_mailbox_autocreate settings.
-#lmtp_save_to_detail_mailbox = no
-
-# Verify quota before replying to RCPT TO. This adds a small overhead.
-#lmtp_rcpt_check_quota = no
-
-# Which recipient address to use for Delivered-To: header and Received:
-# header. The default is "final", which is the same as the one given to
-# RCPT TO command. "original" uses the address given in RCPT TO's ORCPT
-# parameter, "none" uses nothing. Note that "none" is currently always used
-# when a mail has multiple recipients.
-#lmtp_hdr_delivery_address = final
-
-protocol lmtp {
-  # Space separated list of plugins to load (default is global mail_plugins).
-  #mail_plugins = $mail_plugins
+{% if dovecot_lmtp.proxy is defined %}
+lmtp_proxy                   = {{ dovecot_lmtp.proxy | ternary('yes', 'no') }}
+{% endif %}
+{% if dovecot_lmtp.save_to_detail_mailbox is defined %}
+lmtp_save_to_detail_mailbox  = {{ dovecot_lmtp.save_to_detail_mailbox | ternary('yes', 'no') }}
+{% endif %}
+{% if dovecot_lmtp.rcpt_check_quota is defined %}
+lmtp_rcpt_check_quota        = {{ dovecot_lmtp.rcpt_check_quota | ternary('yes', 'no') }}
+{% endif %}
+{% if dovecot_lmtp.hdr_delivery_address is defined and
+      dovecot_lmtp.hdr_delivery_address | string | length > 0 and
+      dovecot_lmtp.hdr_delivery_address in ['final','original','none'] %}
+lmtp_hdr_delivery_address    = {{ dovecot_lmtp.hdr_delivery_address }}
+{% endif %}
+{% if dovecot_lmtp.protocols is defined and
+      dovecot_lmtp.protocols | count > 0 %}
+  {% for pr in dovecot_lmtp.protocols %}
+    {% if pr.name is defined %}
+      {% set _name = pr. name %}
+      {% set _ = pr.pop('name') %}
+    {% else %}
+      {% set _name = pr.keys() | first %}
+    {% endif %}
+protocol {{ _name }} {
+    {% if pr | type == "dict" %}
+      {% for k, v in pr[_name].items() %}
+  {{ k }} = {{ v }}
+      {% endfor %}
+    {% endif %}
 }
+  {% endfor %}
+
+{% endif %}

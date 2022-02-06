@@ -90,13 +90,13 @@ dovecot_defaults_director:
     - director:
         - listener: unix
           type: login/director
-          mode: 0666
-        - listener: unix
-          type: director-userdb
-          #mode: "0600"
+          mode: "0666"
         - listener: fifo
           type: login/proxy-notify
-          #mode: "0666"
+          mode: "0666"
+        - listener: unix
+          type: director-userdb
+          mode: "0600"
         - listener: inet
           port: ""
     # service imap-login {
@@ -475,39 +475,52 @@ dovecot_defaults_master:
 
 dovecot_defaults_ssl:
   enabled: true
-  cert: ""
-  key: ""
-  #ssl_key_password: ""
-  #ssl_ca: ""
-  #ssl_require_crl: true
-  ssl_client_ca_dir: /etc/ssl/certs
-  #ssl_client_ca_file: ""
-  #ssl_verify_client_cert: false
-  #ssl_cert_username_field: commonName
-  ssl_dh: "</usr/share/dovecot/dh.pem"
-  #ssl_min_protocol: TLSv1
-  #ssl_cipher_list: ALL:!kRSA:!SRP:!kDHd:!DSS:!aNULL:!eNULL:!EXPORT:!DES:!3DES:!MD5:!PSK:!RC4:!ADH:!LOW@STRENGTH
-  #ssl_cipher_list: ALL:!DH:!kRSA:!SRP:!kDHd:!DSS:!aNULL:!eNULL:!EXPORT:!DES:!3DES:!MD5:!PSK:!RC4:!ADH:!LOW@STRENGTH
-  #ssl_curve_list: ""
+  cert: "/etc/dovecot/private/dovecot.pem"
+  key: "/etc/dovecot/private/dovecot.key"
+  #key_password: ""
+  #ca: ""
+  #require_crl: true
+  client_ca_dir: /etc/ssl/certs
+  #client_ca_file: ""
+  #verify_client_cert: false
+  #cert_username_field: commonName
+  # Generate new params with `openssl dhparam -out /etc/dovecot/dh.pem 4096`
+  dh: "/usr/share/dovecot/dh.pem"
+  min_protocol: TLSv1.2
+  # cipher_list:
+  #   - ALL
+  #   - "!DH"
+  #   - "!kRSA"
+  #   - "!SRP"
+  #   - "!kDHd"
+  #   - "!DSS"
+  #   - "!aNULL"
+  #   - "!eNULL"
+  #   - "!EXPORT"
+  #   - "!DES"
+  #   - "!3DES"
+  #   - "!MD5"
+  #   - "!PSK"
+  #   - "!RC4"
+  #   - "!ADH"
+  #   - "!LOW@STRENGTH"
+  # curve_list:
+  #   - P-521
+  #   - P-384
+  #   - P-256
   #ssl_prefer_server_ciphers: false
+  # for valid values run "openssl engine"
   #ssl_crypto_device: ""
   #ssl_options: ""
 
 dovecot_defaults_tcpwrapper:
   login_access_sockets: tcpwrap
-  #service tcpwrap {
-  #  unix_listener login/tcpwrap {
-  #    group: $default_login_user
-  #    mode: 0600
-  #    user: $default_login_user
-  #  }
-  #}
   services:
     - login/tcpwrap:
         listeners:
           - login/tcpwrap:
               type: "unix"
-              mode: 0666
+              mode: "0666"
               user: ""
               group: ""
 
@@ -570,40 +583,97 @@ dovecot_defaults_mailboxes:
           special_use: \Flagged
 
 dovecot_defaults_imap:
-  #imap_hibernate_timeout: 0
-  #imap_max_line_length: 64k
-  #imap_logout_format: "in=%i out=%o deleted=%{deleted} expunged=%{expunged} \
-  #  trashed=%{trashed} hdr_count=%{fetch_hdr_count} \
-  #  hdr_bytes=%{fetch_hdr_bytes} body_count=%{fetch_body_count} \
-  #  body_bytes=%{fetch_body_bytes}"
-  #imap_capability: ""
-  #imap_idle_notify_interval: 2 mins
-  #imap_id_send: ""
-  #imap_id_log: ""
+  # hibernate_timeout: 0
+  # max_line_length: 64k
   #
-  #imap_client_workarounds: []
-  #  - delay-newmail
-  #  - tb-extra-mailbox-sep
-  #  - tb-lsub-flags
-  #imap_urlauth_host: ""
-  #imap_literal_minus: false
-  #imap_fetch_failure: disconnect-immediately
+  #  %i - total number of bytes read from client
+  #  %o - total number of bytes sent to client
+  #  %{fetch_hdr_count} - Number of mails with mail header data sent to client
+  #  %{fetch_hdr_bytes} - Number of bytes with mail header data sent to client
+  #  %{fetch_body_count} - Number of mails with mail body data sent to client
+  #  %{fetch_body_bytes} - Number of bytes with mail body data sent to client
+  #  %{deleted} - Number of mails where client added \Deleted flag
+  #  %{expunged} - Number of mails that client expunged, which does not
+  #                include automatically expunged mails
+  #  %{autoexpunged} - Number of mails that were automatically expunged after
+  #                    client disconnected
+  #  %{trashed} - Number of mails that client copied/moved to the
+  #               special_use=\Trash mailbox.
+  #  %{appended} - Number of mails saved during the session
+  logout_format:
+    - "in=%i"
+    - "out=%o"
+    - "deleted=%{deleted}"
+    - "expunged=%{expunged}"
+    - "trashed=%{trashed}"
+    - "hdr_count=%{fetch_hdr_count}"
+    - "hdr_bytes=%{fetch_hdr_bytes}"
+    - "body_count=%{fetch_body_count}"
+    - "body_bytes=%{fetch_body_bytes}"
+  # capability: ""
+  # idle_notify_interval: 2 mins
+  # id_send: ""
+  # id_log: ""
+  #
+  #   delay-newmail:
+  #     Send EXISTS/RECENT new mail notifications only when replying to NOOP
+  #     and CHECK commands. Some clients ignore them otherwise, for example OSX
+  #     Mail (<v2.1). Outlook Express breaks more badly though, without this it
+  #     may show user "Message no longer in server" errors. Note that OE6 still
+  #     breaks even with this workaround if synchronization is set to
+  #     "Headers Only".
+  #   tb-extra-mailbox-sep:
+  #     Thunderbird gets somehow confused with LAYOUT=fs (mbox and dbox) and
+  #     adds extra '/' suffixes to mailbox names. This option causes Dovecot to
+  #     ignore the extra '/' instead of treating it as invalid mailbox name.
+  #   tb-lsub-flags:
+  #     Show \Noselect flags for LSUB replies with LAYOUT=fs (e.g. mbox).
+  #     This makes Thunderbird realize they aren't selectable and show them
+  #     greyed out, instead of only later giving "not selectable" popup error.
+  client_workarounds:
+    - delay-newmail
+  #   - tb-extra-mailbox-sep
+  #   - tb-lsub-flags
+  # urlauth_host: ""
+  # literal_minus: false
+  #
+  #   disconnect-immediately:
+  #     The FETCH is aborted immediately and the IMAP client is disconnected.
+  #   disconnect-after:
+  #     The FETCH runs for all the requested mails returning as much data as
+  #     possible. The client is finally disconnected without a tagged reply.
+  #   no-after:
+  #     Same as disconnect-after, but tagged NO reply is sent instead of
+  #     disconnecting the client. If the client attempts to FETCH the same failed
+  #     mail more than once, the client is disconnected. This is to avoid clients
+  #     from going into infinite loops trying to FETCH a broken mail.
+  fetch_failure: disconnect-immediately
   protocols:
     - imap:
-        # mail_plugins: $mail_plugins
-        # mail_max_userip_connections: 10
+        mail_plugins: $mail_plugins
+        mail_max_userip_connections: 10
 
 dovecot_defaults_lmtp:
-  #lmtp_proxy: false
-  #lmtp_save_to_detail_mailbox: false
-  #lmtp_rcpt_check_quota: false
-  #lmtp_hdr_delivery_address: final
+  # proxy: false
+  # save_to_detail_mailbox: false
+  # rcpt_check_quota: false
+
+  # The default is "final", which is the same as the one given to
+  # RCPT TO command.
+  # "original" uses the address given in RCPT TO's ORCPT
+  # parameter,
+  # "none" uses nothing. Note that "none" is currently always used
+  # when a mail has multiple recipients.
+
+  # hdr_delivery_address: final
   protocols:
     - lmtp:
-        # mail_plugins: $mail_plugins
+        mail_plugins: $mail_plugins
 
 dovecot_defaults_managesieve:
-  #protocols: $protocols sieve
+  enabled_protocols:
+    - "$protocols"
+    - sieve
   #service managesieve-login {
     #inet_listener sieve {
     #}
@@ -611,16 +681,26 @@ dovecot_defaults_managesieve:
     #}
     #service_count: 1
     #process_min_avail: 0
+
     #vsz_limit: 64M
   #}
   services:
     - managesieve-login:
-        #service_count: 1
-        #process_min_avail: 0
-        #vsz_limit: 64M
+        # chroot: login
+        # client_limit: 0
+        # drop_priv_before_exec: no
+        # executable: managesieve-login
+        # extra_groups: ""
+        # group: ""
+        # idle_kill: 0
+        listeners:
         - sieve:
             type: inet
             port: 4190
+            address: ""
+            haproxy: false
+            reuse_port: false
+            ssl: false
         - sieve_deprecated:
             type: inet
             port: 2000
@@ -628,30 +708,45 @@ dovecot_defaults_managesieve:
         process_limit: 1024
 
   protocols:
-    - sieve:
-        #managesieve_max_line_length: 65536
-        #mail_max_userip_connections: 10
-        #mail_plugins: ""
-        #managesieve_logout_format: bytes=%i/%o
-        #managesieve_implementation_string: Dovecot Pigeonhole
-        #managesieve_sieve_capability: ""
-        #managesieve_notify_capability: ""
-        #managesieve_max_compile_errors: 5
+    - sieve: {}
+        # managesieve_max_line_length: 65536
+        # mail_max_userip_connections: 10
+        # mail_plugins: []
+        # #
+        # # MANAGESIEVE logout format string:
+        # #  %i - total number of bytes read from client
+        # #  %o - total number of bytes sent to client
+        # #  %{put_bytes} - Number of bytes saved using PUTSCRIPT command
+        # #  %{put_count} - Number of scripts saved using PUTSCRIPT command
+        # #  %{get_bytes} - Number of bytes read using GETCRIPT command
+        # #  %{get_count} - Number of scripts read using GETSCRIPT command
+        # #  %{get_bytes} - Number of bytes processed using CHECKSCRIPT command
+        # #  %{get_count} - Number of scripts checked using CHECKSCRIPT command
+        # #  %{deleted_count} - Number of scripts deleted using DELETESCRIPT command
+        # #  %{renamed_count} - Number of scripts renamed using RENAMESCRIPT command
+        # managesieve_logout_format:
+        #   - "bytes: %i/%o"
+        #   - "deleted: %{deleted_count}"
+        #   - "renamed: %{renamed_count}"
+        # managesieve_implementation_string: Dovecot Pigeonhole
+        # managesieve_sieve_capability: ""
+        # managesieve_notify_capability: ""
+        # managesieve_max_compile_errors: 5
 
 dovecot_defaults_pop3:
-  #pop3_no_flag_updates: false
-  #pop3_enable_last: false
-  #pop3_reuse_xuidl: false
-  #pop3_lock_session: false
-  #pop3_fast_size_lookups: false
-  #pop3_uidl_format: %08Xu%08Xv
-  #pop3_save_uidl: false
-  #pop3_uidl_duplicates: allow
-  #pop3_deleted_flag: ""
-  #pop3_logout_format: top=%t/%p, retr=%r/%b, del=%d/%m, size=%s
-  #pop3_client_workarounds: ""
+  # no_flag_updates: false
+  # enable_last: false
+  # reuse_xuidl: false
+  # lock_session: false
+  # fast_size_lookups: false
+  # uidl_format: %08Xu%08Xv
+  # save_uidl: false
+  # uidl_duplicates: allow
+  # deleted_flag: ""
+  logout_format: "top=%t/%p, retr=%r/%b, del=%d/%m, size=%s"
+  # client_workarounds: ""
   protocols:
-    - pop3:
+    - pop3: {}
         #mail_plugins: $mail_plugin
         #mail_max_userip_connections: 10
 
