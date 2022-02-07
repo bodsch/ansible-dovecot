@@ -1,3 +1,6 @@
+#jinja2: trim_blocks: True, lstrip_blocks: True
+# {{ ansible_managed }}
+
 # This file is commonly accessed via passdb {} or userdb {} section in
 # conf.d/auth-ldap.conf.ext
 
@@ -21,14 +24,14 @@
 
 # LDAP URIs to use. You can use this instead of hosts list. Note that this
 # setting isn't supported by all LDAP libraries.
-#uris = 
+#uris =
 
 # Distinguished Name - the username used to login to the LDAP server.
 # Leave it commented out to bind anonymously (useful with auth_bind=yes).
-#dn = 
+#dn =
 
 # Password for LDAP server, if dn is specified.
-#dnpass = 
+#dnpass =
 
 # Use SASL binding instead of the simple binding. Note that this changes
 # ldap_version automatically to be 3 if it's lower.

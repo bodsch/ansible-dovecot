@@ -994,7 +994,7 @@ dovecot_defaults_dict_auth:
   default_pass_scheme: MD5
   iterate_prefix: userdb/
   #iterate_disable: false
-  keys:
+  dict_keys:
     - passwd:
         key: passdb/%u
         format: json
@@ -1005,16 +1005,21 @@ dovecot_defaults_dict_auth:
         key: userdb/%u/quota
         default_value: 100M
 
-  passdb_objects: passdb
-
+  passdb_objects:
+    - passdb
   passdb_fields: {}
-  userdb_objects: userdb
+  userdb_objects:
+    - userdb
   userdb_fields:
     quota_rule: "*:storage=%{dict:quota}"
     mail: "maildir:%{dict:userdb.home}/Maildir"
 
 dovecot_defaults_dict_sql:
-  # connect: host=localhost dbname=mails user=testuser password=pass
+  connects:
+    host: localhost
+    dbname: mails
+    user: testuser
+    password: pass
   maps:
     - pattern: priv/quota/storage
       table: quota
@@ -1030,31 +1035,10 @@ dovecot_defaults_dict_sql:
       fields:
         username: $user
         mailbox: $mailbox
-  # map {
-  #   pattern: priv/quota/storage
-  #   table: quota
-  #   username_field: username
-  #   value_field: bytes
-  # }
-  # map {
-  #   pattern: priv/quota/messages
-  #   table: quota
-  #   username_field: username
-  #   value_field: messages
-  # }
-  # map {
-  #   pattern: shared/expire/$user/$mailbox
-  #   table: expires
-  #   value_field: expire_stamp
-  #   fields {
-  #     username: $user
-  #     mailbox: $mailbox
-  #   }
-  # }
 
 dovecot_defaults_ldap:
-  #hosts: ""
-  #uris: ""
+  #hosts: []
+  #uris: []
   #dn: ""
   #dnpass: ""
   #sasl_bind: false

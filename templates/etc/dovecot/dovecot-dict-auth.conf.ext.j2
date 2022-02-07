@@ -1,54 +1,73 @@
-# This file is commonly accessed via passdb {} or userdb {} section in
-# conf.d/auth-dict.conf.ext
+#jinja2: trim_blocks: True, lstrip_blocks: True
+# {{ ansible_managed }}
 
-# Dictionary URI
-#uri = 
-
-# Default password scheme
-default_pass_scheme = MD5
-
-# Username iteration prefix. Keys under this are assumed to contain usernames.
-iterate_prefix = userdb/
-
-# Should iteration be disabled for this userdb? If this userdb acts only as a
-# cache there's no reason to try to iterate the (partial & duplicate) users.
-#iterate_disable = no
-
-# The example here shows how to do multiple dict lookups and merge the replies.
-# The "passdb" and "userdb" keys are JSON objects containing key/value pairs,
-# for example: { "uid": 1000, "gid": 1000, "home": "/home/user" }
-
-key passdb {
-  key = passdb/%u
-  format = json
+{% if dovecot_dict_auth.uri is defined  and
+      dovecot_dict_auth.uri | string | length > 0 %}
+uri                          = {{ dovecot_dict_auth.uri }}
+{% endif %}
+{% if dovecot_dict_auth.default_pass_scheme is defined  and
+      dovecot_dict_auth.default_pass_scheme | string | length > 0 %}
+default_pass_scheme          = {{ dovecot_dict_auth.default_pass_scheme }}
+{% endif %}
+{% if dovecot_dict_auth.iterate_prefix is defined  and
+      dovecot_dict_auth.iterate_prefix | string | length > 0 %}
+iterate_prefix               = {{ dovecot_dict_auth.iterate_prefix }}
+{% endif %}
+{% if dovecot_dict_auth.iterate_disable is defined %}
+iterate_disable              = {{ dovecot_dict_auth.iterate_disable | ternary('yes', 'no') }}
+{% endif %}
+{% if dovecot_dict_auth.dict_keys is defined and
+      dovecot_dict_auth.dict_keys | count > 0 %}
+  {% if dovecot_dict_auth.dict_keys | type == "list" %}
+    {% for key_type in dovecot_dict_auth.dict_keys %}
+key {{ key_type.keys() | first  }} {
+      {% for values in key_type.values() %}
+        {% for k, v in values.items() %}
+          {% if v | type == "bool" %}
+  {{ "%-26s" | format(k) }} = {{ v | ternary('yes', 'no') }}
+          {% else %}
+  {{ "%-26s" | format(k) }} = {{ v }}
+          {% endif %}
+        {% endfor %}
+      {% endfor %}
 }
-key userdb {
-  key = userdb/%u
-  format = json
+    {% endfor %}
+  {% endif %}
+{% endif %}
+{% if dovecot_dict_auth.passdb_objects is defined  and
+      dovecot_dict_auth.passdb_objects | count > 0 %}
+passdb_objects               = {{ dovecot_dict_auth.passdb_objects | join(' ') }}
+{% endif %}
+{% if dovecot_dict_auth.passdb_fields is defined and
+      dovecot_dict_auth.passdb_fields | count > 0 %}
+  {% if dovecot_dict_auth.passdb_fields | type == "dict" %}
+passdb_fields {
+    {% for k,v  in dovecot_dict_auth.passdb_fields.items() %}
+      {% if v | type == "bool" %}
+  {{ "%-26s" | format(k) }} = {{ v | ternary('yes', 'no') }}
+      {% else %}
+  {{ "%-26s" | format(k) }} = {{ v }}
+      {% endif %}
+    {% endfor %}
 }
-key quota {
-  key = userdb/%u/quota
-  #format = value
-  # The default_value is used if the key isn't found. If default_value setting
-  # isn't specified at all (even as empty), the passdb/userdb lookup fails with
-  # "user doesn't exist".
-  default_value = 100M
-}
+  {% endif %}
+{% endif %}
 
-# Space separated list of keys whose values contain key/value paired objects.
-# All the key/value pairs inside the object are added as passdb fields.
-passdb_objects = passdb
-
-#passdb_fields {
-#}
-
-# Userdb key/value object list.
-userdb_objects = userdb
-
+{% if dovecot_dict_auth.userdb_objects is defined  and
+      dovecot_dict_auth.userdb_objects | count > 0 %}
+userdb_objects               = {{ dovecot_dict_auth.userdb_objects | join(' ') }}
+{% endif %}
+{% if dovecot_dict_auth.userdb_fields is defined and
+      dovecot_dict_auth.userdb_fields | count > 0 %}
+  {% if dovecot_dict_auth.userdb_fields | type == "dict" %}
 userdb_fields {
-  # dict:<key> refers to key names
-  quota_rule = *:storage=%{dict:quota}
-
-  # dict:<key>.<objkey> refers to the objkey inside (JSON) object
-  mail = maildir:%{dict:userdb.home}/Maildir
+    {% for k,v  in dovecot_dict_auth.userdb_fields.items() %}
+      {% if v | type == "bool" %}
+  {{ "%-26s" | format(k) }} = {{ v | ternary('yes', 'no') }}
+      {% else %}
+  {{ "%-26s" | format(k) }} = {{ v }}
+      {% endif %}
+    {% endfor %}
 }
+  {% endif %}
+{% endif %}

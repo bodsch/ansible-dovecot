@@ -1,41 +1,27 @@
-# This file is commonly accessed via dict {} section in dovecot.conf
+#jinja2: trim_blocks: True, lstrip_blocks: True
+# {{ ansible_managed }}
 
-#connect = host=localhost dbname=mails user=testuser password=pass
+{% if dovecot_dict_sql.connects is defined  and
+      dovecot_dict_sql.connects | count > 0 %}
+connect                      = host={{ dovecot_dict_sql.connects.host }} dbname={{ dovecot_dict_sql.connects.dbname }} user={{ dovecot_dict_sql.connects.user }} password={{ dovecot_dict_sql.connects.password }}
+{% endif %}
 
-# CREATE TABLE quota (
-#   username varchar(100) not null,
-#   bytes bigint not null default 0,
-#   messages integer not null default 0,
-#   primary key (username)
-# );
-
+{% if dovecot_dict_sql.maps is defined and
+      dovecot_dict_sql.maps | count > 0 %}
+  {% for m in dovecot_dict_sql.maps %}
 map {
-  pattern = priv/quota/storage
-  table = quota
-  username_field = username
-  value_field = bytes
-}
-map {
-  pattern = priv/quota/messages
-  table = quota
-  username_field = username
-  value_field = messages
-}
+    {% for k, v in m.items() %}
+      {% if v | type != "dict" %}
+  {{ "%-26s" | format(k) }} = {{ v }}
+      {% else %}
 
-# CREATE TABLE expires (
-#   username varchar(100) not null,
-#   mailbox varchar(255) not null,
-#   expire_stamp integer not null,
-#   primary key (username, mailbox)
-# );
-
-map {
-  pattern = shared/expire/$user/$mailbox
-  table = expires
-  value_field = expire_stamp
-
-  fields {
-    username = $user
-    mailbox = $mailbox
+  {{ k }} {
+    {% for kk, vv in v.items() %}
+    {{ "%-24s" | format(kk) }} = {{ vv }}
+    {% endfor %}
   }
+      {% endif %}
+    {% endfor %}
 }
+  {% endfor %}
+{% endif %}
