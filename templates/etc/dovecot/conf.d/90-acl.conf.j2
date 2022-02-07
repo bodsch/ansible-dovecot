@@ -1,19 +1,13 @@
-##
-## Mailbox access control lists.
-##
+#jinja2: trim_blocks: True, lstrip_blocks: True
+# {{ ansible_managed }}
 
-# vfile backend reads ACLs from "dovecot-acl" file from mail directory.
-# You can also optionally give a global ACL directory path where ACLs are
-# applied to all users' mailboxes. The global ACL directory contains
-# one file for each mailbox, eg. INBOX or sub.mailbox. cache_secs parameter
-# specifies how many seconds to wait between stat()ing dovecot-acl file
-# to see if it changed.
+{% if dovecot_acl.plugins is defined and
+      dovecot_acl.plugins | count > 0 %}
+  {% if dovecot_acl.plugins | type == "list" %}
+    {% for plugin in dovecot_acl.plugins %}
 plugin {
-  #acl = vfile:/etc/dovecot/global-acls:cache_secs=300
+  {{ plugin.keys() | first }} = {{ plugin.values() | first }}
 }
-
-# To let users LIST mailboxes shared by other users, Dovecot needs a
-# shared mailbox dictionary. For example:
-plugin {
-  #acl_shared_dict = file:/var/lib/dovecot/shared-mailboxes
-}
+    {% endfor %}
+  {% endif %}
+{% endif %}

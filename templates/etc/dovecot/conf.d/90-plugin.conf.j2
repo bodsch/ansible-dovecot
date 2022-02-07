@@ -1,11 +1,13 @@
-##
-## Plugin settings
-##
+#jinja2: trim_blocks: True, lstrip_blocks: True
+# {{ ansible_managed }}
 
-# All wanted plugins must be listed in mail_plugins setting before any of the
-# settings take effect. See <doc/wiki/Plugins.txt> for list of plugins and
-# their configuration. Note that %variable expansion is done for all values.
-
+{% if dovecot_plugin.plugins is defined and
+      dovecot_plugin.plugins | count > 0 %}
+  {% if dovecot_plugin.plugins | type == "list" %}
+    {% for plugin in dovecot_plugin.plugins %}
 plugin {
-  #setting_name = value
+  {{ plugin.keys() | first }} = {{ plugin.values() | first }}
 }
+    {% endfor %}
+  {% endif %}
+{% endif %}
