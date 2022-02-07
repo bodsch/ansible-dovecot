@@ -1,24 +1,19 @@
-# Static passdb. Included from 10-auth.conf.
+#jinja2: trim_blocks: True, lstrip_blocks: True
+# {{ ansible_managed }}
 
-# This can be used for situations where Dovecot doesn't need to verify the
-# username or the password, or if there is a single password for all users:
-#
-#  - proxy frontend, where the backend verifies the password
-#  - proxy backend, where the frontend already verified the password
-#  - authentication with SSL certificates
-#  - simple testing
-
-#passdb {
-#  driver = static
-#  args = proxy=y host=%1Mu.example.com nopassword=y
-#}
-
-#passdb {
-#  driver = static
-#  args = password=test
-#}
-
-#userdb {
-#  driver = static
-#  args = uid=vmail gid=vmail home=/home/%u
-#}
+{% if dovecot_authentications.static is defined and
+      dovecot_authentications.static | count > 0 %}
+  {% for _type, values in dovecot_authentications.static.items() %}
+    {% if values | count > 0 %}
+{{ _type }} {
+      {% for k, v in values.items() %}
+        {% if v | type == "bool" %}
+  {{ "%-26s" | format(k) }} = {{ v | ternary('yes', 'no') }}
+        {% else %}
+  {{ "%-26s" | format(k) }} = {{ v }}
+        {% endif %}
+      {% endfor %}
+}
+    {% endif %}
+  {% endfor %}
+{% endif %}

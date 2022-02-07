@@ -1,20 +1,19 @@
-# Authentication for passwd-file users. Included from 10-auth.conf.
-#
-# passwd-like file with specified location.
-# <doc/wiki/AuthDatabase.PasswdFile.txt>
+#jinja2: trim_blocks: True, lstrip_blocks: True
+# {{ ansible_managed }}
 
-passdb {
-  driver = passwd-file
-  args = scheme=CRYPT username_format=%u /etc/dovecot/users
+{% if dovecot_authentications.passwdfile is defined and
+      dovecot_authentications.passwdfile | count > 0 %}
+  {% for _type, values in dovecot_authentications.passwdfile.items() %}
+    {% if values | count > 0 %}
+{{ _type }} {
+      {% for k, v in values.items() %}
+        {% if v | type == "bool" %}
+  {{ "%-26s" | format(k) }} = {{ v | ternary('yes', 'no') }}
+        {% else %}
+  {{ "%-26s" | format(k) }} = {{ v }}
+        {% endif %}
+      {% endfor %}
 }
-
-userdb {
-  driver = passwd-file
-  args = username_format=%u /etc/dovecot/users
-
-  # Default fields that can be overridden by passwd-file
-  #default_fields = quota_rule=*:storage=1G
-
-  # Override fields from passwd-file
-  #override_fields = home=/home/virtual/%u
-}
+    {% endif %}
+  {% endfor %}
+{% endif %}

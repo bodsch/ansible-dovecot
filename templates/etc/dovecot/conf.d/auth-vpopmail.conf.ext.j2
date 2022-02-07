@@ -1,17 +1,19 @@
-# Authentication for vpopmail users. Included from 10-auth.conf.
-#
-# <doc/wiki/AuthDatabase.VPopMail.txt>
+#jinja2: trim_blocks: True, lstrip_blocks: True
+# {{ ansible_managed }}
 
-passdb {
-  driver = vpopmail
-
-  # [cache_key=<key>] [webmail=<ip>]
-  args =
+{% if dovecot_authentications.vpopmail is defined and
+      dovecot_authentications.vpopmail | count > 0 %}
+  {% for _type, values in dovecot_authentications.vpopmail.items() %}
+    {% if values | count > 0 %}
+{{ _type }} {
+      {% for k, v in values.items() %}
+        {% if v | type == "bool" %}
+  {{ "%-26s" | format(k) }} = {{ v | ternary('yes', 'no') }}
+        {% else %}
+  {{ "%-26s" | format(k) }} = {{ v }}
+        {% endif %}
+      {% endfor %}
 }
-
-userdb {
-  driver = vpopmail
-
-  # [quota_template=<template>] - %q expands to Maildir++ quota
-  args = quota_template=quota_rule=*:backend=%q
-}
+    {% endif %}
+  {% endfor %}
+{% endif %}

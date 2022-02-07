@@ -1,16 +1,19 @@
-# Authentication for master users. Included from 10-auth.conf.
+#jinja2: trim_blocks: True, lstrip_blocks: True
+# {{ ansible_managed }}
 
-# By adding master=yes setting inside a passdb you make the passdb a list
-# of "master users", who can log in as anyone else.
-# <doc/wiki/Authentication.MasterUsers.txt>
-
-# Example master user passdb using passwd-file. You can use any passdb though.
-passdb {
-  driver = passwd-file
-  master = yes
-  args = /etc/dovecot/master-users
-
-  # Unless you're using PAM, you probably still want the destination user to
-  # be looked up from passdb that it really exists. pass=yes does that.
-  pass = yes
+{% if dovecot_authentications.master is defined and
+      dovecot_authentications.master | count > 0 %}
+  {% for _type, values in dovecot_authentications.master.items() %}
+    {% if values | count > 0 %}
+{{ _type }} {
+      {% for k, v in values.items() %}
+        {% if v | type == "bool" %}
+  {{ "%-26s" | format(k) }} = {{ v | ternary('yes', 'no') }}
+        {% else %}
+  {{ "%-26s" | format(k) }} = {{ v }}
+        {% endif %}
+      {% endfor %}
 }
+    {% endif %}
+  {% endfor %}
+{% endif %}

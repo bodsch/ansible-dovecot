@@ -1,33 +1,19 @@
-# Authentication for LDAP users. Included from 10-auth.conf.
-#
-# <doc/wiki/AuthDatabase.LDAP.txt>
+#jinja2: trim_blocks: True, lstrip_blocks: True
+# {{ ansible_managed }}
 
-passdb {
-  driver = ldap
-
-  # Path for LDAP configuration file, see example-config/dovecot-ldap.conf.ext
-  args = /etc/dovecot/dovecot-ldap.conf.ext
+{% if dovecot_authentications.ldap is defined and
+      dovecot_authentications.ldap | count > 0 %}
+  {% for _type, values in dovecot_authentications.ldap.items() %}
+    {% if values | count > 0 %}
+{{ _type }} {
+      {% for k, v in values.items() %}
+        {% if v | type == "bool" %}
+  {{ "%-26s" | format(k) }} = {{ v | ternary('yes', 'no') }}
+        {% else %}
+  {{ "%-26s" | format(k) }} = {{ v }}
+        {% endif %}
+      {% endfor %}
 }
-
-# "prefetch" user database means that the passdb already provided the
-# needed information and there's no need to do a separate userdb lookup.
-# <doc/wiki/UserDatabase.Prefetch.txt>
-#userdb {
-#  driver = prefetch
-#}
-
-userdb {
-  driver = ldap
-  args = /etc/dovecot/dovecot-ldap.conf.ext
-  
-  # Default fields can be used to specify defaults that LDAP may override
-  #default_fields = home=/home/virtual/%u
-}
-
-# If you don't have any user-specific settings, you can avoid the userdb LDAP
-# lookup by using userdb static instead of userdb ldap, for example:
-# <doc/wiki/UserDatabase.Static.txt>
-#userdb {
-  #driver = static
-  #args = uid=vmail gid=vmail home=/var/vmail/%u
-#}
+    {% endif %}
+  {% endfor %}
+{% endif %}

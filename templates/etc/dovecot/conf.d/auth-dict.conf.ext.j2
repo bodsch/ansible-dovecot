@@ -1,16 +1,19 @@
-# Authentication via dict backend. Included from 10-auth.conf.
-#
-# <doc/wiki/AuthDatabase.Dict.txt>
+#jinja2: trim_blocks: True, lstrip_blocks: True
+# {{ ansible_managed }}
 
-passdb {
-  driver = dict
-
-  # Path for dict configuration file, see
-  # example-config/dovecot-dict-auth.conf.ext
-  args = /etc/dovecot/dovecot-dict-auth.conf.ext
+{% if dovecot_authentications.dict is defined and
+      dovecot_authentications.dict | count > 0 %}
+  {% for _type, values in dovecot_authentications.dict.items() %}
+    {% if values | count > 0 %}
+{{ _type }} {
+      {% for k, v in values.items() %}
+        {% if v | type == "bool" %}
+  {{ "%-26s" | format(k) }} = {{ v | ternary('yes', 'no') }}
+        {% else %}
+  {{ "%-26s" | format(k) }} = {{ v }}
+        {% endif %}
+      {% endfor %}
 }
-
-userdb {
-  driver = dict
-  args = /etc/dovecot/dovecot-dict-auth.conf.ext
-}
+    {% endif %}
+  {% endfor %}
+{% endif %}
