@@ -11,7 +11,7 @@ on:
 
 defaults:
   run:
-    working-directory: 'ansible-postfix'
+    working-directory: 'ansible-dovecot'
 
 jobs:
   lint:
@@ -46,14 +46,14 @@ jobs:
         python-version:
           - '3.9'
         ansible-version:
-          - '3.4.0'
+          - '4.1.0'
           - '5.1.0'
 
     steps:
       - name: check out the codebase.
         uses: actions/checkout@v2
         with:
-          path: 'ansible-postfix'
+          path: 'ansible-dovecot'
 
       - name: set up python ${{ matrix.python-version }}
         uses: actions/setup-python@v2
@@ -93,19 +93,18 @@ jobs:
         image:
           - debian:10
           - debian:11
-          - ubuntu:18.04
           - ubuntu:20.04
         python-version:
           - '3.9'
         ansible-version:
-          - '3.4.0'
+          - '4.1.0'
           - '5.1.0'
 
     steps:
       - name: check out the codebase.
         uses: actions/checkout@v2
         with:
-          path: 'ansible-postfix'
+          path: 'ansible-dovecot'
 
       - name: set up python ${{ matrix.python-version }}
         uses: actions/setup-python@v2
@@ -156,7 +155,7 @@ jobs:
   #     - name: check out the codebase.
   #       uses: actions/checkout@v2
   #       with:
-  #         path: 'ansible-postfix'
+  #         path: 'ansible-dovecot'
   #
   #     - name: set up python ${{ matrix.python-version }}
   #       uses: actions/setup-python@v2
