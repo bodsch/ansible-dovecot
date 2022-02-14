@@ -70,3 +70,29 @@ def get_vars(host):
     result = templar.template(ansible_vars, fail_on_undefined=False)
 
     return result
+
+
+@pytest.mark.parametrize("dirs", [
+    "/etc/dovecot",
+    "/etc/dovecot/conf.d",
+    "/var/log/dovecot"
+])
+def test_directories(host, dirs):
+    d = host.file(dirs)
+    assert d.is_directory
+    assert d.exists
+
+
+@pytest.mark.parametrize("files", [
+    "/etc/dovecot/dovecot.conf",
+    "/etc/dovecot/dovecot-dict-auth.conf.ext",
+    "/etc/dovecot/dovecot-dict-sql.conf.ext",
+    "/etc/dovecot/dovecot-ldap.conf.ext",
+    "/etc/dovecot/dovecot-sql.conf.ext",
+    "/etc/dovecot/conf.d/10-auth.conf",
+    "/etc/dovecot/conf.d/10-mail.conf",
+])
+def test_files(host, files):
+    f = host.file(files)
+    assert f.exists
+    assert f.is_file

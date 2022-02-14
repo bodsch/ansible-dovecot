@@ -4,6 +4,8 @@ dovecot_config:
   listen:
     - "127.0.0.1"
 
+dovecot_master: {}
+
 dovecot_mail:
   namespaces:
     - type: private

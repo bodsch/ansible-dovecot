@@ -474,9 +474,9 @@ dovecot_defaults_master:
               group: ""
 
 dovecot_defaults_ssl:
-  enabled: true
-  cert: "/etc/dovecot/private/dovecot.pem"
-  key: "/etc/dovecot/private/dovecot.key"
+  enabled: false
+  # cert: "/etc/dovecot/private/dovecot.pem"
+  # key: "/etc/dovecot/private/dovecot.key"
   #key_password: ""
   #ca: ""
   #require_crl: true
@@ -485,7 +485,7 @@ dovecot_defaults_ssl:
   #verify_client_cert: false
   #cert_username_field: commonName
   # Generate new params with `openssl dhparam -out /etc/dovecot/dh.pem 4096`
-  dh: "/usr/share/dovecot/dh.pem"
+  # dh: "/usr/share/dovecot/dh.pem"
   min_protocol: TLSv1.2
   # cipher_list:
   #   - ALL
