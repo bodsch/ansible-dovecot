@@ -6,6 +6,16 @@
     path: "{{ dovecot_logging_directory }}"
     mode: 0755
 
+- name: create configuration directory
+  file:
+    state: directory
+    path: "{{ item }}"
+    mode: 0755
+  loop:
+    - /etc/dovecot
+    - /etc/dovecot/conf.d
+
+
 - name: create dovecot.conf
   template:
     src: etc/dovecot/dovecot.conf.j2

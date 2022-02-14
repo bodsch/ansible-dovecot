@@ -1,4 +1,5 @@
 ---
+
 extends: default
 rules:
   line-length:
@@ -19,7 +20,7 @@ rules:
 ignore: |
   tests/
   molecule/
-  .molecule/
-  .travis.yml
   .tox
   .github
+
+...

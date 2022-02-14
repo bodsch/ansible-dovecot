@@ -57,15 +57,15 @@ dovecot_defaults_auth:
     - login
     - cram-md5
   includes:
-    - # auth-deny.conf.ext
-    - # auth-master.conf.ext
+    - "# auth-deny.conf.ext"
+    - "# auth-master.conf.ext"
     - auth-system.conf.ext
-    - # auth-sql.conf.ext
-    - # auth-ldap.conf.ext
-    - # auth-passwdfile.conf.ext
-    - # auth-checkpassword.conf.ext
-    - # auth-vpopmail.conf.ext
-    - # auth-static.conf.ext
+    - "# auth-sql.conf.ext"
+    - "# auth-ldap.conf.ext"
+    - "# auth-passwdfile.conf.ext"
+    - "# auth-checkpassword.conf.ext"
+    - "# auth-vpopmail.conf.ext"
+    - "# auth-static.conf.ext"
 
 dovecot_defaults_director:
   director_servers: ""
