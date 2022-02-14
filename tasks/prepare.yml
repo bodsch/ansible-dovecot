@@ -36,8 +36,6 @@
 - name: gathering facts now
   setup:
 
-
-
 - name: merge dovecot config configuration between defaults and custom
   set_fact:
     dovecot_config: "{{ dovecot_defaults_config |

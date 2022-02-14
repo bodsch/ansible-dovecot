@@ -39,6 +39,14 @@
     - 90-quota.conf
     - 90-sieve-extprograms.conf
     - 90-sieve.conf
+
+- name: create auth configurations
+  template:
+    src: etc/dovecot/conf.d/{{ item }}.j2
+    dest: /etc/dovecot/conf.d/{{ item }}
+    backup: true
+    mode: 0644
+  loop:
     - auth-checkpassword.conf.ext
     - auth-deny.conf.ext
     - auth-dict.conf.ext
@@ -49,4 +57,17 @@
     - auth-static.conf.ext
     - auth-system.conf.ext
     - auth-vpopmail.conf.ext
+
+- name: create conf.ext configuration files
+  template:
+    src: etc/dovecot/{{ item }}.j2
+    dest: /etc/dovecot/{{ item }}
+    backup: true
+    mode: 0644
+  loop:
+    - dovecot-dict-auth.conf.ext
+    - dovecot-dict-sql.conf.ext
+    - dovecot-ldap.conf.ext
+    - dovecot-sql.conf.ext
+
 ...

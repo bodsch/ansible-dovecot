@@ -3,8 +3,8 @@
 - name: start and enable service
   service:
     name: dovecot
-    state: "{{ service_default_state | default('started') }}"
-    enabled: "{{ service_default_enabled | default(true) | bool }}"
+    state: "{{ dovecot_service_state | default('started') }}"
+    enabled: "{{ dovecot_service_enabled | default(true) | bool }}"
   tags:
     - configuration
     - dovecot
