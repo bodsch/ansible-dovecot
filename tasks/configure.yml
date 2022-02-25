@@ -15,7 +15,6 @@
     - /etc/dovecot
     - /etc/dovecot/conf.d
 
-
 - name: create dovecot.conf
   template:
     src: etc/dovecot/dovecot.conf.j2
