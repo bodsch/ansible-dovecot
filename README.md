@@ -3,6 +3,16 @@
 
 Ansible role to install and configure dovecot on various linux systems.
 
+
+[![GitHub Workflow Status](https://img.shields.io/github/workflow/status/bodsch/ansible-dovecot/CI)][ci]
+[![GitHub issues](https://img.shields.io/github/issues/bodsch/ansible-dovecot)][issues]
+[![GitHub release (latest by date)](https://img.shields.io/github/v/release/bodsch/ansible-dovecot)][releases]
+
+[ci]: https://github.com/bodsch/ansible-dovecot/actions
+[issues]: https://github.com/bodsch/ansible-dovecot/issues?q=is%3Aopen+is%3Aissue
+[releases]: https://github.com/bodsch/ansible-dovecot/releases
+
+
 ## Requirements & Dependencies
 
 
