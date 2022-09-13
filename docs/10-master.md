@@ -1,4 +1,57 @@
-# 10-master.conf 
+# 10-master.conf
+
+[upstream doku](https://doc.dovecot.org/configuration_manual/service_configuration/?highlight=service)
+
+## Dovecot Service configuration
+
+All services are defined as a list.
+Below this, each service can be configured individually.
+
+Services that are to provide a listener must define this via a `listeners` list.
+This allows a number of listeners to be configured for a service.
+
+For each listener, the type can be defined individually.
+The following types can be used:
+
+- unix
+- inet
+
+
+For example, the `imap-login` service.  
+
+```yaml
+dovecot_master:
+  services:
+    - imap-login:
+        service_count: 1
+        process_min_avail: 0
+        listeners:
+          - imap:
+              type: "inet"
+              port: 143
+          - imaps:
+              type: inet
+              port: 993
+              ssl: true
+```
+
+creates the following configuration entry:
+
+```bash
+    service imap-login {
+      inet_listener imap {
+        port: 143
+      }
+      inet_listener imaps {
+        port: 993
+        ssl: true
+      }
+      service_count: 1
+      process_min_avail: 0
+    }
+```
+
+
 
 ```yaml
 dovecot_master:

@@ -22,7 +22,8 @@ default_login_user           = {{ dovecot_master.default_login_user }}
 default_internal_user        = {{ dovecot_master.default_internal_user }}
 {% endif %}
 
-{% if dovecot_master.services is defined and dovecot_master.services | count > 0 %}
+{% if dovecot_master.services is defined and
+      dovecot_master.services | count > 0 %}
   {% for service in dovecot_master.services %}
     {% for key, values in service.items() %}
 service {{ key }} {
