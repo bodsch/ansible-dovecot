@@ -6,6 +6,15 @@ dovecot_config:
 
 dovecot_master: {}
 
+dovecot_logging:
+  auth_debug: true
+  auth_debug_passwords: true
+  auth_verbose: true
+  # false, plain, sha1
+  auth_verbose_passwords: plain
+  debug_log_path: /var/log/dovecot/debug.log
+  mail_debug: true
+
 dovecot_mail:
   namespaces:
     - type: private
@@ -77,18 +86,18 @@ dovecot_sieve_extprograms: {}
 dovecot_sieve:
   plugins: []
 
-dovecot_sql:
-  driver: sqlite
-  connect: /etc/dovecot/authdb.sqlite
-  default_pass_scheme: MD5
-  password_query: >
-      SELECT username, domain, password
-      FROM users
-      WHERE username: '%n' AND domain: '%d'
-  user_query: >
-    SELECT home, uid, gid
-    FROM users
-    WHERE username: '%n' AND domain: '%d'
-  iterate_query: SELECT username AS user FROM users
+# dovecot_sql:
+#   driver: sqlite
+#   connect: /etc/dovecot/authdb.sqlite
+#   default_pass_scheme: MD5
+#   password_query: >
+#       SELECT username, domain, password
+#       FROM users
+#       WHERE username: '%n' AND domain: '%d'
+#   user_query: >
+#     SELECT home, uid, gid
+#     FROM users
+#     WHERE username: '%n' AND domain: '%d'
+#   iterate_query: SELECT username AS user FROM users
 
 ...

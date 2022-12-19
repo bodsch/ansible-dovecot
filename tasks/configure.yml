@@ -1,13 +1,13 @@
 ---
 
 - name: create logging directory
-  file:
+  ansible.builtin.file:
     state: directory
     path: "{{ dovecot_logging_directory }}"
     mode: 0755
 
 - name: create configuration directory
-  file:
+  ansible.builtin.file:
     state: directory
     path: "{{ item }}"
     mode: 0755
@@ -16,7 +16,7 @@
     - /etc/dovecot/conf.d
 
 - name: create dovecot.conf
-  template:
+  ansible.builtin.template:
     src: etc/dovecot/dovecot.conf.j2
     dest: /etc/dovecot/dovecot.conf
     backup: true
@@ -25,7 +25,7 @@
     - restart dovecot
 
 - name: create splitted configurations
-  template:
+  ansible.builtin.template:
     src: etc/dovecot/conf.d/{{ item }}.j2
     dest: /etc/dovecot/conf.d/{{ item }}
     backup: true
@@ -54,7 +54,7 @@
     - restart dovecot
 
 - name: create auth configurations
-  template:
+  ansible.builtin.template:
     src: etc/dovecot/conf.d/{{ item }}.j2
     dest: /etc/dovecot/conf.d/{{ item }}
     backup: true
@@ -74,7 +74,7 @@
     - restart dovecot
 
 - name: create conf.ext configuration files
-  template:
+  ansible.builtin.template:
     src: etc/dovecot/{{ item }}.j2
     dest: /etc/dovecot/{{ item }}
     backup: true

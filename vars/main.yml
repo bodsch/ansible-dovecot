@@ -435,9 +435,9 @@ dovecot_defaults_managesieve:
               haproxy: false
               reuse_port: false
               ssl: false
-          - sieve_deprecated:
-              type: inet
-              port: 2000
+          # - sieve_deprecated: {}
+          #    type: inet
+          #    port: 2000
     - managesieve:
         process_limit: 1024
 
