@@ -28,10 +28,9 @@ class FilterModule(object):
     def config_value(self, data, default=None):
         """
         """
-        display.v("config_value({}, {})".format(data, default))
+        # display.v(f"config_value({data}, {default})")
 
         result = None
-        display.v("  - {} {}".format(data, type(data)))
 
         if type(data) is None:
             result = False
@@ -40,5 +39,5 @@ class FilterModule(object):
         else:
             result = data
 
-        display.v("return : {}".format(result))
+        # display.v(f"return : {result}")
         return result

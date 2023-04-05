@@ -22,7 +22,7 @@ class FilterModule(object):
     def compare_list(self, data_list, compare_to_list):
         """
         """
-        display.v("compare_list({}, {})".format(data_list, compare_to_list))
+        # display.v(f"compare_list({data_list}, {compare_to_list})")
 
         result = []
 
@@ -30,21 +30,13 @@ class FilterModule(object):
             if i in compare_to_list:
                 result.append(i)
 
-        # randomized result :(
-        # result = list(
-        #     set(
-        #         data_list).intersection(sorted(compare_to_list)
-        #     )
-        # )
-
-        display.v("return : {}".format(result))
+        # display.v(f"return : {result}")
         return result
 
     def validate_attachment_hash(self, data, compare_to_list):
         """
-
         """
-        display.v("validate_attachment_hash({}, {})".format(data, compare_to_list))
+        display.v(f"validate_attachment_hash({data}, {compare_to_list})")
 
         if ':' in data:
             for i in compare_to_list:
