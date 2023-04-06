@@ -1,0 +1,122 @@
+---
+
+dovecot_config:
+  listen:
+    - "127.0.0.1"
+
+dovecot_master: {}
+
+dovecot_logging:
+  auth_debug: true
+  auth_debug_passwords: true
+  auth_verbose: true
+  # false, plain, sha1
+  auth_verbose_passwords: plain
+  debug_log_path: /var/log/dovecot/debug.log
+  mail_debug: true
+
+dovecot_mail:
+  mail_location: maildir:~/
+  mail_uid: 1101
+  mail_gid: 1101
+  mail_attachment_fs: sis-queue posix
+  mail_attachment_hash: "%{sha1:120}"
+  mail_home: /var/vmail/%d/%n
+  mail_location: maildir:~/
+  # mail_plugins: </etc/dovecot/mail_plugins
+  mail_attachment_fs: "crypt:set_prefix=mail_crypt_global:posix:"
+  mail_attachment_dir: /var/attachments
+  mail_attachment_min_size: 128k
+
+  first_valid_uid: 1101
+  last_valid_uid: 1101
+  first_valid_gid: 1101
+  last_valid_gid: 1101
+
+  namespaces:
+    - type: private
+      name: inbox
+      separator: "."
+      prefix: INBOX.
+      inbox: true
+      list: true
+      subscriptions: true
+      location: "maildir:%h:INDEX=/srv/mail/INDEX/%d/%n:CONTROL=/srv/mail/CONTROL/%d/%n:LAYOUT=maildir++"
+
+    - type: public
+      separator: "."
+      prefix: shared.
+      location: "maildir:/srv/mail/PUBLIC:INDEX=/srv/mail/PUBLIC/indexes:CONTROL=/srv/mail/PUBLIC/control:LAYOUT=maildir++"
+      list: children
+      subscriptions: true
+
+    - type: shared
+      seperator: "."
+      prefix: "shared.%%u."
+      location: "maildir:%%h:INDEX=~/Shared/%%u"
+      list: children
+      subscriptions: false
+
+dovecot_auth:
+  disable_plaintext_auth: true
+
+
+# dovecot_lmtp:
+#   protocols:
+#     - lmtp: {}
+#
+# dovecot_tcpwrapper:
+#   login_access_sockets: tcpwrap
+#   services: []
+#
+# dovecot_managesieve:
+#   service_count: 1
+#   process_min_avail: 0
+#   vsz_limit: 64M
+#   services: []
+#   protocols: []
+#
+#
+# dovecot_pop3:
+#   protocols:
+#     - pop3: {}
+#
+# dovecot_submission: {}
+#
+# dovecot_acl:
+#   plugins:
+#     # plugin {
+#     #   #acl: vfile:/etc/dovecot/global-acls:cache_secs=300
+#     # }
+#     - acl: vfile:/etc/dovecot/global-acls:cache_secs=300
+#     # plugin {
+#     #   #acl_shared_dict: file:/var/lib/dovecot/shared-mailboxes
+#     # }
+#     - acl_shared_dict: file:/var/lib/dovecot/shared-mailboxes
+#
+# dovecot_plugin:
+#   plugins: []
+#
+# dovecot_quota: {}
+#
+# dovecot_sieve_extprograms: {}
+#
+# dovecot_sieve:
+#   plugins: []
+#
+# dovecot_sql:
+#
+#   driver: sqlite
+#   connect: /etc/dovecot/authdb.sqlite
+#   default_pass_scheme: MD5
+#   password_query: >
+#       SELECT username, domain, password
+#       FROM users
+#       WHERE username: '%n' AND domain: '%d'
+#   user_query: >
+#     SELECT home, uid, gid
+#     FROM users
+#     WHERE username: '%n' AND domain: '%d'
+#   iterate_query: SELECT username AS user FROM users
+
+...
