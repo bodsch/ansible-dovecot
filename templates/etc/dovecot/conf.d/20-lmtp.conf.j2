@@ -2,13 +2,13 @@
 # {{ ansible_managed }}
 
 {% if dovecot_lmtp.proxy is defined %}
-lmtp_proxy                   = {{ dovecot_lmtp.proxy | ternary('yes', 'no') }}
+lmtp_proxy                   = {{ dovecot_lmtp.proxy | bodsch.core.config_bool(true_as='yes', false_as='no') }}
 {% endif %}
 {% if dovecot_lmtp.save_to_detail_mailbox is defined %}
-lmtp_save_to_detail_mailbox  = {{ dovecot_lmtp.save_to_detail_mailbox | ternary('yes', 'no') }}
+lmtp_save_to_detail_mailbox  = {{ dovecot_lmtp.save_to_detail_mailbox | bodsch.core.config_bool(true_as='yes', false_as='no') }}
 {% endif %}
 {% if dovecot_lmtp.rcpt_check_quota is defined %}
-lmtp_rcpt_check_quota        = {{ dovecot_lmtp.rcpt_check_quota | ternary('yes', 'no') }}
+lmtp_rcpt_check_quota        = {{ dovecot_lmtp.rcpt_check_quota | bodsch.core.config_bool(true_as='yes', false_as='no') }}
 {% endif %}
 {% if dovecot_lmtp.hdr_delivery_address is defined and
       dovecot_lmtp.hdr_delivery_address | string | length > 0 and

@@ -23,10 +23,10 @@ login_access_sockets         = {{ dovecot_config.login_access_sockets | join(' '
 {% endif %}
 #auth_proxy_self              =
 {% if dovecot_config.verbose_proctitle is defined %}
-verbose_proctitle            = {{ dovecot_config.verbose_proctitle | bool | ternary('yes', 'no') }}
+verbose_proctitle            = {{ dovecot_config.verbose_proctitle | bodsch.core.config_bool(true_as='yes', false_as='no') }}
 {% endif %}
 {% if dovecot_config.shutdown_clients is defined %}
-shutdown_clients             = {{ dovecot_config.shutdown_clients | bool | ternary('yes', 'no') }}
+shutdown_clients             = {{ dovecot_config.shutdown_clients | bodsch.core.config_bool(true_as='yes', false_as='no') }}
 {% endif %}
 {% if dovecot_config.doveadm_worker_count is defined %}
 doveadm_worker_count         = {{ dovecot_config.doveadm_worker_count }}

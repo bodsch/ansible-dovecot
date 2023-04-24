@@ -18,7 +18,7 @@ dn                           = {{ dovecot_ldap.dn }}
 dnpass                       = {{ dovecot_ldap.dnpass }}
 {% endif %}
 {% if dovecot_ldap.sasl_bind is defined %}
-sasl_bind                    = {{ dovecot_ldap.sasl_bind | ternary('yes', 'no') }}
+sasl_bind                    = {{ dovecot_ldap.sasl_bind | bodsch.core.config_bool(true_as='yes', false_as='no') }}
 {% endif %}
 {% if dovecot_ldap.sasl_mech is defined and
       dovecot_ldap.sasl_mech | string | length > 0 %}
@@ -33,7 +33,7 @@ sasl_realm                   = {{ dovecot_ldap.sasl_realm }}
 sasl_authz_id                = {{ dovecot_ldap.sasl_authz_id }}
 {% endif %}
 {% if dovecot_ldap.tls is defined %}
-tls                          = {{ dovecot_ldap.tls | ternary('yes', 'no') }}
+tls                          = {{ dovecot_ldap.tls | bodsch.core.config_bool(true_as='yes', false_as='no') }}
   {% if dovecot_ldap.tls_ca_cert_file is defined and
         dovecot_ldap.tls_ca_cert_file | string | length > 0 %}
 tls_ca_cert_file             = {{ dovecot_ldap.tls_ca_cert_file }}
@@ -69,7 +69,7 @@ ldaprc_path                  = {{ dovecot_ldap.ldaprc_path }}
 debug_level                  = {{ dovecot_ldap.debug_level }}
 {% endif %}
 {% if dovecot_ldap.auth_bind is defined %}
-auth_bind                    = {{ dovecot_ldap.auth_bind | ternary('yes', 'no') }}
+auth_bind                    = {{ dovecot_ldap.auth_bind | bodsch.core.config_bool(true_as='yes', false_as='no') }}
 {% endif %}
 {% if dovecot_ldap.auth_bind_userdn is defined and
       dovecot_ldap.auth_bind_userdn | string | length > 0 %}
@@ -123,5 +123,5 @@ iterate_filter               = {{ dovecot_ldap.iterate_filter }}
 default_pass_scheme          = {{ dovecot_ldap.default_pass_scheme }}
 {% endif %}
 {% if dovecot_ldap.blocking is defined %}
-blocking                     = = {{ dovecot_ldap.blocking | ternary('yes', 'no') }}
+blocking                     = = {{ dovecot_ldap.blocking | bodsch.core.config_bool(true_as='yes', false_as='no') }}
 {% endif %}

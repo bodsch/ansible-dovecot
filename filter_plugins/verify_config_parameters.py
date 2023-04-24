@@ -15,23 +15,23 @@ class FilterModule(object):
 
     def filters(self):
         return {
-            'compare_list': self.compare_list,
+            # 'compare_list': self.compare_list,
             'validate_attachment_hash': self.validate_attachment_hash,
         }
 
-    def compare_list(self, data_list, compare_to_list):
-        """
-        """
-        # display.v(f"compare_list({data_list}, {compare_to_list})")
-
-        result = []
-
-        for i in data_list:
-            if i in compare_to_list:
-                result.append(i)
-
-        # display.v(f"return : {result}")
-        return result
+    # def compare_list(self, data_list, compare_to_list):
+    #     """
+    #     """
+    #     # display.v(f"compare_list({data_list}, {compare_to_list})")
+    #
+    #     result = []
+    #
+    #     for i in data_list:
+    #         if i in compare_to_list:
+    #             result.append(i)
+    #
+    #     # display.v(f"return : {result}")
+    #     return result
 
     def validate_attachment_hash(self, data, compare_to_list):
         """

@@ -17,7 +17,7 @@ class FilterModule(object):
         return {
             'type': self.var_type,
             'config_value': self.config_value,
-            'config_bool': self.config_bool,
+            # 'config_bool': self.config_bool,
         }
 
     def var_type(self, var):
@@ -43,22 +43,22 @@ class FilterModule(object):
         # display.v(f"return : {result}")
         return result
 
-    def config_bool(self, data):
-        """
-        """
-        display.v(f"config_bool({data}, {type(data)})")
-
-        result = 'no'
-
-        if isinstance(data, bool):
-            result = 'yes' if data else 'no'
-
-        if type(data) is None:
-            result = False
-        elif type(data) is bool:
-            result = 'yes' if data else 'no'
-        else:
-            result = data
-
-        # display.v(f"return : {result}")
-        return result
+    # def config_bool(self, data):
+    #     """
+    #     """
+    #     display.v(f"config_bool({data}, {type(data)})")
+    #
+    #     result = 'no'
+    #
+    #     if isinstance(data, bool):
+    #         result = 'yes' if data else 'no'
+    #
+    #     if type(data) is None:
+    #         result = False
+    #     elif type(data) is bool:
+    #         result = 'yes' if data else 'no'
+    #     else:
+    #         result = data
+    #
+    #     # display.v(f"return : {result}")
+    #     return result

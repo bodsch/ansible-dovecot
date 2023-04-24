@@ -5,19 +5,6 @@ dovecot_logging_directory: /var/log/dovecot
 dovecot_service_state: started
 dovecot_service_enabled: true
 
-# dovecot_hostname: "{{ ansible_fqdn }}"
-
-# dovecot_default_mysql:
-#   host: "127.0.0.1"
-#   port: 3306
-#   user: "dovecot"
-#   password:
-#   database: "mail"
-#
-# dovecot_default_config:
-#   policy_source: "mysql"
-#   managesieve_enabled: true
-
 dovecot_config:
   listen:
     - "*"

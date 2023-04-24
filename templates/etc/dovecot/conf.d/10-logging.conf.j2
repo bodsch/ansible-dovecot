@@ -28,27 +28,27 @@ log_debug                    = {{ dovecot_logging.log_debug | join(' ') }}
 log_core_filter              = {{ dovecot_logging.log_core_filter }}
 {% endif %}
 {% if dovecot_logging.auth_verbose is defined %}
-auth_verbose                 = {{ dovecot_logging.auth_verbose | bool | ternary('yes', 'no') }}
+auth_verbose                 = {{ dovecot_logging.auth_verbose | bodsch.core.config_bool(true_as='yes', false_as='no') }}
 {% endif %}
 {% if dovecot_logging.auth_verbose_passwords is defined %}
   {% if dovecot_logging.auth_verbose_passwords | type == "str" and
         dovecot_logging.auth_verbose_passwords in ['plain', 'sha1'] %}
 auth_verbose_passwords       = {{ dovecot_logging.auth_verbose_passwords }}
   {% elif dovecot_logging.auth_verbose_passwords | type == "bool" %}
-auth_verbose_passwords       = {{ dovecot_logging.auth_verbose_passwords | bool | ternary('yes', 'no') }}
+auth_verbose_passwords       = {{ dovecot_logging.auth_verbose_passwords | bodsch.core.config_bool(true_as='yes', false_as='no') }}
   {% endif %}
 {% endif %}
 {% if dovecot_logging.auth_debug is defined %}
-auth_debug                   = {{ dovecot_logging.auth_debug | bool | ternary('yes', 'no') }}
+auth_debug                   = {{ dovecot_logging.auth_debug | bodsch.core.config_bool(true_as='yes', false_as='no') }}
 {% endif %}
 {% if dovecot_logging.auth_debug_passwords is defined %}
-auth_debug_passwords         = {{ dovecot_logging.auth_debug_passwords | bool | ternary('yes', 'no') }}
+auth_debug_passwords         = {{ dovecot_logging.auth_debug_passwords | bodsch.core.config_bool(true_as='yes', false_as='no') }}
 {% endif %}
 {% if dovecot_logging.mail_debug is defined %}
-mail_debug                   = {{ dovecot_logging.mail_debug | bool | ternary('yes', 'no') }}
+mail_debug                   = {{ dovecot_logging.mail_debug | bodsch.core.config_bool(true_as='yes', false_as='no') }}
 {% endif %}
 {% if dovecot_logging.verbose_ssl is defined %}
-verbose_ssl                  = {{ dovecot_logging.verbose_ssl | bool | ternary('yes', 'no') }}
+verbose_ssl                  = {{ dovecot_logging.verbose_ssl | bodsch.core.config_bool(true_as='yes', false_as='no') }}
 {% endif %}
 
 {% if dovecot_logging.plugins is defined and
