@@ -249,7 +249,6 @@ dovecot_defaults_ssl:
   client_ca_file: ""
   verify_client_cert: false
   cert_username_field: ""  # commonName
-  dh: ""
   min_protocol: TLSv1.2
   cipher_list:
     - ALL
