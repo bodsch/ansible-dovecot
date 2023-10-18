@@ -2,7 +2,7 @@
 # {{ ansible_managed }}
 
 {% if dovecot_ssl.enabled is defined %}
-ssl                          = {{ dovecot_ssl.enabled | bool | ternary('yes', 'no') }}
+ssl                          = {{ dovecot_ssl.enabled | bodsch.core.config_bool(true_as='yes', false_as='no') }}
   {% if dovecot_ssl.cert is defined and
         dovecot_ssl.cert | length > 0 %}
 ssl_cert                     = <{{ dovecot_ssl.cert }}
@@ -20,7 +20,7 @@ ssl_key_password             = {{ dovecot_ssl.key_password }}
 ssl_ca                       = <{{ dovecot_ssl.ca }}
   {% endif %}
   {% if dovecot_ssl.require_crl is defined %}
-ssl_require_crl              = {{ dovecot_ssl.require_crl | bool | ternary('yes', 'no') }}
+ssl_require_crl              = {{ dovecot_ssl.require_crl | bodsch.core.config_bool(true_as='yes', false_as='no') }}
   {% endif %}
   {% if dovecot_ssl.client_ca_dir is defined and
         dovecot_ssl.client_ca_dir | length > 0 %}
@@ -31,7 +31,7 @@ ssl_client_ca_dir            = {{ dovecot_ssl.client_ca_dir }}
 ssl_client_ca_file           = {{ dovecot_ssl.client_ca_file }}
   {% endif %}
   {% if dovecot_ssl.verify_client_cert is defined %}
-ssl_verify_client_cert       = {{ dovecot_ssl.verify_client_cert | bool | ternary('yes', 'no') }}
+ssl_verify_client_cert       = {{ dovecot_ssl.verify_client_cert | bodsch.core.config_bool(true_as='yes', false_as='no') }}
     {% if dovecot_ssl.cert_username_field is defined and
           dovecot_ssl.cert_username_field | length > 0 %}
 ssl_cert_username_field      = {{ dovecot_ssl.cert_username_field }}
@@ -55,7 +55,7 @@ ssl_cipher_list              = {{ dovecot_ssl.cipher_list | join(':') }}
 ssl_curve_list               = {{ dovecot_ssl.curve_list | join(':') }}
   {% endif %}
   {% if dovecot_ssl.prefer_server_ciphers is defined %}
-ssl_prefer_server_ciphers    = {{ dovecot_ssl.prefer_server_ciphers | bool | ternary('yes', 'no') }}
+ssl_prefer_server_ciphers    = {{ dovecot_ssl.prefer_server_ciphers | bodsch.core.config_bool(true_as='yes', false_as='no') }}
   {% endif %}
   {% if dovecot_ssl.crypto_device is defined and
         dovecot_ssl.crypto_device | count > 0 %}

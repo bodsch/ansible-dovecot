@@ -52,7 +52,7 @@ namespace {{ ns.name | default("") }} {
 {% endif %}
 
 {% if dovecot_mail.mail_shared_explicit_inbox is defined %}
-mail_shared_explicit_inbox  = {{ dovecot_mail.mail_shared_explicit_inbox | bool | ternary('yes','no') }}
+mail_shared_explicit_inbox  = {{ dovecot_mail.mail_shared_explicit_inbox | bodsch.core.config_bool(true_as='yes', false_as='no') }}
 {% endif %}
 {% if dovecot_mail.mail_uid is defined and
       dovecot_mail.mail_uid | string | length > 0 %}
@@ -71,7 +71,7 @@ mail_privileged_group        = {{ dovecot_mail.mail_privileged_group }}
 mail_access_groups           = {{ dovecot_mail.mail_access_groups }}
 {% endif %}
 {% if dovecot_mail.mail_access_groups is defined %}
-mail_full_filesystem_access  = {{ dovecot_mail.mail_access_groups | bool | ternary('yes','no') }}
+mail_full_filesystem_access  = {{ dovecot_mail.mail_access_groups | bodsch.core.config_bool(true_as='yes', false_as='no') }}
 {% endif %}
 {% if dovecot_mail.mail_attribute_dict is defined and
       dovecot_mail.mail_attribute_dict | length > 0 %}
@@ -88,10 +88,10 @@ mail_server_admin            = {{ dovecot_mail.mail_server_admin }}
 
 {# Mail processes #}
 {% if dovecot_mail.mmap_disable is defined %}
-mmap_disable                 = {{ dovecot_mail.mmap_disable | bool | ternary('yes','no') }}
+mmap_disable                 = {{ dovecot_mail.mmap_disable | bodsch.core.config_bool(true_as='yes', false_as='no') }}
 {% endif %}
 {% if dovecot_mail.dotlock_use_excl is defined %}
-dotlock_use_excl             = {{ dovecot_mail.dotlock_use_excl | bool | ternary('yes','no') }}
+dotlock_use_excl             = {{ dovecot_mail.dotlock_use_excl | bodsch.core.config_bool(true_as='yes', false_as='no') }}
 {% endif %}
 {% if dovecot_mail.mail_fsync is defined and
       dovecot_mail.mail_fsync | length > 0 and
@@ -150,13 +150,13 @@ mail_plugins                 = {{ dovecot_mail.mail_plugins | join(' ') }}
 
 {# Mailbox handling optimizations #}
 {% if dovecot_mail.mailbox_list_index is defined %}
-mailbox_list_index           = {{ dovecot_mail.mailbox_list_index | bool | ternary('yes','no') }}
+mailbox_list_index           = {{ dovecot_mail.mailbox_list_index | bodsch.core.config_bool(true_as='yes', false_as='no') }}
 {% endif %}
 {% if dovecot_mail.mailbox_list_index_very_dirty_syncs is defined %}
-mailbox_list_index_very_dirty_syncs = {{ dovecot_mail.mailbox_list_index_very_dirty_syncs | bool | ternary('yes','no') }}
+mailbox_list_index_very_dirty_syncs = {{ dovecot_mail.mailbox_list_index_very_dirty_syncs | bodsch.core.config_bool(true_as='yes', false_as='no') }}
 {% endif %}
 {% if dovecot_mail.mailbox_list_index_include_inbox is defined %}
-mailbox_list_index_include_inbox = {{ dovecot_mail.mailbox_list_index_include_inbox | bool | ternary('yes','no') }}
+mailbox_list_index_include_inbox = {{ dovecot_mail.mailbox_list_index_include_inbox | bodsch.core.config_bool(true_as='yes', false_as='no') }}
 {% endif %}
 {% if dovecot_mail.mail_cache_min_mail_count is defined and
       dovecot_mail.mail_cache_min_mail_count | string | length > 0 %}
@@ -167,7 +167,7 @@ mail_cache_min_mail_count    = {{ dovecot_mail.mail_cache_min_mail_count | int }
 mailbox_idle_check_interval  = {{ dovecot_mail.mailbox_idle_check_interval }}
 {% endif %}
 {% if dovecot_mail.mail_save_crlf is defined %}
-mail_save_crlf               = {{ dovecot_mail.mail_save_crlf | bool | ternary('yes','no') }}
+mail_save_crlf               = {{ dovecot_mail.mail_save_crlf | bodsch.core.config_bool(true_as='yes', false_as='no') }}
 {% endif %}
 {% if dovecot_mail.mail_prefetch_count is defined and
       dovecot_mail.mail_prefetch_count | string | length > 0 %}
@@ -200,31 +200,31 @@ protocol {{ _name }} {
 
 {# Maildir-specific settings #}
 {% if dovecot_mail.maildir_stat_dirs is defined %}
-maildir_stat_dirs            = {{ dovecot_mail.maildir_stat_dirs | bool | ternary('yes','no') }}
+maildir_stat_dirs            = {{ dovecot_mail.maildir_stat_dirs | bodsch.core.config_bool(true_as='yes', false_as='no') }}
 {% endif %}
 {% if dovecot_mail.maildir_copy_with_hardlinks is defined %}
-maildir_copy_with_hardlinks  = {{ dovecot_mail.maildir_copy_with_hardlinks | bool | ternary('yes','no') }}
+maildir_copy_with_hardlinks  = {{ dovecot_mail.maildir_copy_with_hardlinks | bodsch.core.config_bool(true_as='yes', false_as='no') }}
 {% endif %}
 {% if dovecot_mail.maildir_very_dirty_syncs is defined %}
-maildir_very_dirty_syncs     = {{ dovecot_mail.maildir_very_dirty_syncs | bool | ternary('yes','no') }}
+maildir_very_dirty_syncs     = {{ dovecot_mail.maildir_very_dirty_syncs | bodsch.core.config_bool(true_as='yes', false_as='no') }}
 {% endif %}
 {% if dovecot_mail.maildir_broken_filename_sizes is defined %}
-maildir_broken_filename_sizes = {{ dovecot_mail.maildir_broken_filename_sizes | bool | ternary('yes','no') }}
+maildir_broken_filename_sizes = {{ dovecot_mail.maildir_broken_filename_sizes | bodsch.core.config_bool(true_as='yes', false_as='no') }}
 {% endif %}
 {% if dovecot_mail.maildir_empty_new is defined %}
-maildir_empty_new            = {{ dovecot_mail.maildir_empty_new | bool | ternary('yes','no') }}
+maildir_empty_new            = {{ dovecot_mail.maildir_empty_new | bodsch.core.config_bool(true_as='yes', false_as='no') }}
 {% endif %}
 
 {# mbox-specific settings #}
 {% if dovecot_mail.mbox_read_locks is defined and
       dovecot_mail.mbox_read_locks | length > 0 %}
   {% set _attr = ['fcntl', 'flock', 'dotlock', 'dotlock_try', 'lockf'] %}
-mbox_read_locks              = {{ dovecot_mail.mbox_read_locks | compare_list(_attr) | join(' ') }}
+mbox_read_locks              = {{ dovecot_mail.mbox_read_locks | bodsch.core.compare_list(compare_to_list=_attr) | join(' ') }}
 {% endif %}
 {% if dovecot_mail.mbox_write_locks is defined and
       dovecot_mail.mbox_write_locks | length > 0 %}
   {% set _attr = ['fcntl', 'flock', 'dotlock', 'dotlock_try', 'lockf'] %}
-mbox_write_locks             = {{ dovecot_mail.mbox_write_locks | compare_list(_attr) | join(' ') }}
+mbox_write_locks             = {{ dovecot_mail.mbox_write_locks | bodsch.core.compare_list(compare_to_list=_attr) | join(' ') }}
 {% endif %}
 {% if dovecot_mail.mbox_lock_timeout is defined and
       dovecot_mail.mbox_lock_timeout | length > 0 %}
@@ -235,13 +235,13 @@ mbox_lock_timeout            = {{ dovecot_mail.mbox_lock_timeout }}
 mbox_dotlock_change_timeout  = {{ dovecot_mail.mbox_dotlock_change_timeout }}
 {% endif %}
 {% if dovecot_mail.mbox_dirty_syncs is defined %}
-mbox_dirty_syncs             = {{ dovecot_mail.mbox_dirty_syncs | bool | ternary('yes','no') }}
+mbox_dirty_syncs             = {{ dovecot_mail.mbox_dirty_syncs | bodsch.core.config_bool(true_as='yes', false_as='no') }}
 {% endif %}
 {% if dovecot_mail.mbox_dirty_syncs is defined %}
-mbox_very_dirty_syncs        = {{ dovecot_mail.mbox_very_dirty_syncs | bool | ternary('yes','no') }}
+mbox_very_dirty_syncs        = {{ dovecot_mail.mbox_very_dirty_syncs | bodsch.core.config_bool(true_as='yes', false_as='no') }}
 {% endif %}
 {% if dovecot_mail.mbox_dirty_syncs is defined %}
-mbox_lazy_writes             = {{ dovecot_mail.mbox_lazy_writes | bool | ternary('yes','no') }}
+mbox_lazy_writes             = {{ dovecot_mail.mbox_lazy_writes | bodsch.core.config_bool(true_as='yes', false_as='no') }}
 {% endif %}
 {% if dovecot_mail.mbox_min_index_size is defined and
       dovecot_mail.mbox_min_index_size | string | length > 0 %}
@@ -262,7 +262,7 @@ mdbox_rotate_size            = {{ dovecot_mail.mdbox_rotate_size }}
 mdbox_rotate_interval        = {{ dovecot_mail.mbox_min_index_size }}
 {% endif %}
 {% if dovecot_mail.mdbox_preallocate_space is defined %}
-mdbox_preallocate_space      = {{ dovecot_mail.mdbox_preallocate_space | bool | ternary('yes','no') }}
+mdbox_preallocate_space      = {{ dovecot_mail.mdbox_preallocate_space | bodsch.core.config_bool(true_as='yes', false_as='no') }}
 {% endif %}
 
 {# Mail attachments #}

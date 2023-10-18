@@ -10,7 +10,7 @@ postmaster_address           = {{ dovecot_lda.postmaster_address }}
 hostname                     = {{ dovecot_lda.hostname }}
 {% endif %}
 {% if dovecot_lda.quota_full_tempfail is defined %}
-quota_full_tempfail          = {{ dovecot_lda.quota_full_tempfail | bool | ternary('yes', 'no') }}
+quota_full_tempfail          = {{ dovecot_lda.quota_full_tempfail | bodsch.core.config_bool(true_as='yes', false_as='no') }}
 {% endif %}
 {% if dovecot_lda.sendmail_path is defined and
       dovecot_lda.sendmail_path | string | length > 0 %}
@@ -37,10 +37,10 @@ recipient_delimiter          = {{ dovecot_lda.recipient_delimiter }}
 lda_original_recipient_header = {{ dovecot_lda.original_recipient_header }}
 {% endif%}
 {% if dovecot_lda.mailbox_autocreate is defined %}
-lda_mailbox_autocreate       = {{ dovecot_lda.mailbox_autocreate | bool | ternary('yes', 'no') }}
+lda_mailbox_autocreate       = {{ dovecot_lda.mailbox_autocreate | bodsch.core.config_bool(true_as='yes', false_as='no') }}
 {% endif%}
 {% if dovecot_lda.mailbox_autosubscribe is defined %}
-lda_mailbox_autosubscribe    = {{ dovecot_lda.mailbox_autosubscribe | bool | ternary('yes', 'no') }}
+lda_mailbox_autosubscribe    = {{ dovecot_lda.mailbox_autosubscribe | bodsch.core.config_bool(true_as='yes', false_as='no') }}
 {% endif%}
 {% if dovecot_lda.protocols is defined and
       dovecot_lda.protocols | count > 0 %}
