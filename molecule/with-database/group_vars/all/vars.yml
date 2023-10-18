@@ -16,10 +16,8 @@ dovecot_logging:
   mail_debug: true
 
 dovecot_mail:
-  mail_location: maildir:~/
   mail_uid: 1101
   mail_gid: 1101
-  mail_attachment_fs: sis-queue posix
   mail_attachment_hash: "%{sha1:120}"
   mail_home: /var/vmail/%d/%n
   mail_location: maildir:~/
