@@ -2,10 +2,12 @@
 
 
 ```yaml
-dovecot_defaults_sieve:
+dovecot_sieve:
   plugins:
     - default:
-        sieve: file:~/sieve;active=~/.dovecot.sieve
+        sieve: file:%h/sieve;active=%h/dovecot.sieve
+        sieve_dir: /srv/mail/sieve/%d/%u
+        sieve_global_dir: /srv/mail/sieve/global
         # sieve_default: /var/lib/dovecot/sieve/default.sieve
         # sieve_default_name: ""
         # sieve_global: ""

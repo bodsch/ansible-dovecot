@@ -9,6 +9,12 @@ dovecot_config:
   listen:
     - "*"
 
+dovecot_virtual_user:
+  name: vmail
+  home: /var/vmail
+  uid: 1101
+  gid: 1101
+
 dovecot_auth: {}
 dovecot_director: {}
 dovecot_logging: {}
@@ -40,8 +46,10 @@ dovecot_auth_sql: {}
 dovecot_auth_static: {}
 dovecot_auth_system: {}
 dovecot_auth_vpopmail: {}
+
 dovecot_dict_auth: {}
 dovecot_dict_sql: {}
+
 dovecot_ldap: {}
 dovecot_sql: {}
 

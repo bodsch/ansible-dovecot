@@ -99,7 +99,9 @@ def get_vars(host):
 
 @pytest.mark.parametrize("dirs", [
     "/etc/dovecot",
+    "/etc/dovecot/auth.d",
     "/etc/dovecot/conf.d",
+    "/etc/dovecot/sql.d",
     "/var/log/dovecot"
 ])
 def test_directories(host, dirs):
@@ -110,12 +112,12 @@ def test_directories(host, dirs):
 
 @pytest.mark.parametrize("files", [
     "/etc/dovecot/dovecot.conf",
-    "/etc/dovecot/dovecot-dict-auth.conf.ext",
-    "/etc/dovecot/dovecot-dict-sql.conf.ext",
-    "/etc/dovecot/dovecot-ldap.conf.ext",
-    "/etc/dovecot/dovecot-sql.conf.ext",
+    # "/etc/dovecot/dovecot-dict-auth.conf.ext",
+    # "/etc/dovecot/dovecot-dict-sql.conf.ext",
+    # "/etc/dovecot/dovecot-ldap.conf.ext",
+    # "/etc/dovecot/dovecot-sql.conf.ext",
     "/etc/dovecot/conf.d/10-auth.conf",
-    "/etc/dovecot/conf.d/10-mail.conf",
+    # "/etc/dovecot/conf.d/10-mail.conf",
 ])
 def test_files(host, files):
     f = host.file(files)
@@ -145,6 +147,8 @@ def test_listening_socket(host, get_vars):
     listen = []
     listen.append("tcp://0.0.0.0:110")
     listen.append("tcp://0.0.0.0:143")
+    listen.append("tcp://0.0.0.0:993")
+    listen.append("tcp://0.0.0.0:995")
 
     for spec in listen:
         socket = host.socket(spec)

@@ -3,17 +3,17 @@
 
 {% if dovecot_sieve.plugins is defined and
       dovecot_sieve.plugins | count > 0 %}
-  {% if dovecot_sieve.plugins | type == "list" %}
+  {% if dovecot_sieve.plugins | bodsch.core.type == "list" %}
     {% for plugin in dovecot_sieve.plugins %}
 plugin {
-      {% if plugin | type == "dict" %}
+      {% if plugin | bodsch.core.type == "dict" %}
         {% for _, v in plugin.items() %}
           {% if v | count > 0 %}
             {% for key, value in v.items() %}
-              {% if value | type == "bool" %}
-  {{ "%-26s" | format(key) }} = {{ value | bodsch.core.config_bool(true_as='yes', false_as='no') }}
+              {% if value | bodsch.core.type == "bool" %}
+  {{ "%-27s" | format(key) }} = {{ value | bodsch.core.config_bool(true_as='yes', false_as='no') }}
               {% else %}
-  {{ "%-26s" | format(key) }} = {{ value }}
+  {{ "%-27s" | format(key) }} = {{ value }}
               {% endif %}
             {% endfor %}
           {% endif %}

@@ -51,9 +51,9 @@ pop3_client_workarounds      = {{ dovecot_pop3.client_workarounds | bodsch.core.
       {% set _name = pr.keys() | first %}
     {% endif %}
 protocol {{ _name }} {
-    {% if pr | type == "dict" %}
+    {% if pr | bodsch.core.type == "dict" %}
       {% for k, v in pr[_name].items() %}
-        {% if v | type == "list" %}
+        {% if v | bodsch.core.type == "list" %}
           {% if v | count != 0 %}
   {{ k }} = {{ v | join(' ') }}
           {% endif %}

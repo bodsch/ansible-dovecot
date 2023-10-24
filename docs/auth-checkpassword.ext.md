@@ -2,12 +2,13 @@
 
 
 ```yaml
-dovecot_defaults_authentications:
+dovecot_authentications:
   - checkpassword:
       passdb:
         driver: checkpassword
         args: /usr/bin/checkpassword
       userdb:
         driver: prefetch
+
 ```
 

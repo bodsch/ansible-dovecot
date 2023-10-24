@@ -28,9 +28,9 @@
       ansible_virtualization_role | default('host') == 'guest' and
       ansible_virtualization_type | default('none') == 'docker' }}"
 
-- name: update package cache
-  ansible.builtin.package:
-    update_cache: true
+# - name: update package cache
+#   ansible.builtin.package:
+#     update_cache: true
 
 - name: install dependencies
   ansible.builtin.package:
@@ -38,6 +38,28 @@
     state: present
   when:
     - dovecot_dependencies | default([]) | count > 0
+
+- name: user and group handling
+  when:
+    - dovecot_virtual_user.name != "root"
+  block:
+    - name: create dovecot virtual user group
+      ansible.builtin.group:
+        name: "{{ dovecot_virtual_user.name }}"
+        state: present
+        system: false
+        gid: "{{ dovecot_virtual_user.gid }}"
+
+    - name: create dovecot virtual user
+      ansible.builtin.user:
+        name: "{{ dovecot_virtual_user.name }}"
+        groups: "{{ dovecot_virtual_user.name }}"
+        append: true
+        shell: /usr/sbin/nologin
+        system: false
+        uid: "{{ dovecot_virtual_user.uid }}"
+        createhome: true
+        home: "{{ dovecot_virtual_user.home }}"
 
 - name: gathering facts now
   ansible.builtin.setup:
