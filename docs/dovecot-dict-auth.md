@@ -1,11 +1,16 @@
 # dovecot-dict-auth.conf
 
+https://doc.dovecot.org/configuration_manual/authentication/dict/?highlight=default_pass_scheme
+
+This file is commonly accessed via `passdb {}` or `userdb {}` section in
+`auth.d/auth-dict.conf.ext`
+
 ```yaml
 dovecot_defaults_dict_auth:
-  #uri: ""
+  # uri: ""
   default_pass_scheme: MD5
   iterate_prefix: userdb/
-  #iterate_disable: false
+  # iterate_disable: false
   dict_keys:
     - passwd:
         key: passdb/%u
@@ -26,5 +31,3 @@ dovecot_defaults_dict_auth:
     quota_rule: "*:storage=%{dict:quota}"
     mail: "maildir:%{dict:userdb.home}/Maildir"
 ```
-
-

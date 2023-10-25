@@ -2,7 +2,7 @@
 
 
 ```yaml
-dovecot_defaults_submission: {}
+dovecot_submission: {}
   # hostname: ""
   # SMTP Submission logout format string:
   #  %i - total number of bytes read from client

@@ -2,7 +2,7 @@
 
 
 ```yaml
-dovecot_defaults_authentications:
+dovecot_authentications:
   - master:
       passdb:
         driver: passwd-file

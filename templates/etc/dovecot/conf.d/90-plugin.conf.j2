@@ -3,11 +3,11 @@
 
 {% if dovecot_plugin.plugins is defined and
       dovecot_plugin.plugins | count > 0 %}
-  {% if dovecot_plugin.plugins | type == "list" %}
-    {% for plugin in dovecot_plugin.plugins %}
+  {% if dovecot_plugin.plugins | bodsch.core.type == "list" %}
 plugin {
+    {% for plugin in dovecot_plugin.plugins %}
   {{ plugin.keys() | first }} = {{ plugin.values() | first }}
-}
     {% endfor %}
+}
   {% endif %}
 {% endif %}

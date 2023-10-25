@@ -15,9 +15,10 @@ class FilterModule(object):
 
     def filters(self):
         return {
-            'type': self.var_type,
+            # 'type': self.var_type,
             'config_value': self.config_value,
             # 'config_bool': self.config_bool,
+            'database_connection': self.database_connection,
         }
 
     def var_type(self, var):
@@ -43,22 +44,33 @@ class FilterModule(object):
         # display.v(f"return : {result}")
         return result
 
-    # def config_bool(self, data):
-    #     """
-    #     """
-    #     display.v(f"config_bool({data}, {type(data)})")
-    #
-    #     result = 'no'
-    #
-    #     if isinstance(data, bool):
-    #         result = 'yes' if data else 'no'
-    #
-    #     if type(data) is None:
-    #         result = False
-    #     elif type(data) is bool:
-    #         result = 'yes' if data else 'no'
-    #     else:
-    #         result = data
-    #
-    #     # display.v(f"return : {result}")
-    #     return result
+    def database_connection(self, data):
+        """
+        """
+        display.v(f"database_connection({data})")
+
+        result = ""
+
+        if isinstance(data, dict):
+            _dba_hostname = data.get("host", None)
+            _dba_port = data.get("port", None)
+            _dba_schemaname = data.get("dbname", None)
+            _dba_username = data.get("user", None)
+            _dba_password = data.get("password", None)
+            _dba_connect = []
+
+            if _dba_hostname:
+                _dba_connect.append(f"host={_dba_hostname}")
+            if _dba_port:
+                _dba_connect.append(f"port={_dba_port}")
+            if _dba_schemaname:
+                _dba_connect.append(f"dbname={_dba_schemaname}")
+            if _dba_username:
+                _dba_connect.append(f"user={_dba_username}")
+            if _dba_password:
+                _dba_connect.append(f"password={_dba_password}")
+
+            result = " ".join(_dba_connect)
+
+        display.v(f"return : {result}")
+        return result
