@@ -107,21 +107,46 @@ def get_vars(host):
 def test_directories(host, dirs):
     d = host.file(dirs)
     assert d.is_directory
-    assert d.exists
 
 
 @pytest.mark.parametrize("files", [
     "/etc/dovecot/dovecot.conf",
-    # "/etc/dovecot/dovecot-dict-auth.conf.ext",
-    # "/etc/dovecot/dovecot-dict-sql.conf.ext",
-    # "/etc/dovecot/dovecot-ldap.conf.ext",
-    # "/etc/dovecot/dovecot-sql.conf.ext",
+    "/etc/dovecot/dovecot-dict-auth.conf.ext",
+    "/etc/dovecot/dovecot-dict-sql.conf.ext",
+    "/etc/dovecot/dovecot-ldap.conf.ext",
+    "/etc/dovecot/dovecot-sql.conf.ext",
     "/etc/dovecot/conf.d/10-auth.conf",
-    # "/etc/dovecot/conf.d/10-mail.conf",
+    "/etc/dovecot/conf.d/10-director.conf",
+    "/etc/dovecot/conf.d/10-logging.conf",
+    "/etc/dovecot/conf.d/10-mail.conf",
+    "/etc/dovecot/conf.d/10-master.conf",
+    "/etc/dovecot/conf.d/10-ssl.conf",
+    "/etc/dovecot/conf.d/10-tcpwrapper.conf",
+    "/etc/dovecot/conf.d/15-lda.conf",
+    "/etc/dovecot/conf.d/15-mailboxes.conf",
+    "/etc/dovecot/conf.d/20-imap.conf",
+    "/etc/dovecot/conf.d/20-lmtp.conf",
+    "/etc/dovecot/conf.d/20-managesieve.conf",
+    "/etc/dovecot/conf.d/20-pop3.conf",
+    "/etc/dovecot/conf.d/20-submission.conf",
+    "/etc/dovecot/conf.d/90-acl.conf",
+    "/etc/dovecot/conf.d/90-plugin.conf",
+    "/etc/dovecot/conf.d/90-quota.conf",
+    "/etc/dovecot/conf.d/90-sieve-extprograms.conf",
+    "/etc/dovecot/conf.d/90-sieve.conf",
+    "/etc/dovecot/auth.d/auth-checkpassword.conf.ext",
+    "/etc/dovecot/auth.d/auth-deny.conf.ext",
+    "/etc/dovecot/auth.d/auth-dict.conf.ext",
+    "/etc/dovecot/auth.d/auth-ldap.conf.ext",
+    "/etc/dovecot/auth.d/auth-master.conf.ext",
+    "/etc/dovecot/auth.d/auth-passwdfile.conf.ext",
+    "/etc/dovecot/auth.d/auth-sql.conf.ext",
+    "/etc/dovecot/auth.d/auth-static.conf.ext",
+    "/etc/dovecot/auth.d/auth-system.conf.ext",
+    "/etc/dovecot/auth.d/auth-vpopmail.conf.ext",
 ])
 def test_files(host, files):
     f = host.file(files)
-    assert f.exists
     assert f.is_file
 
 
