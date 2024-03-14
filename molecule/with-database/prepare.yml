@@ -46,3 +46,10 @@
 
   roles:
     - role: syslog-ng
+
+- name: prepare database
+  hosts: database
+  gather_facts: true
+
+  roles:
+    - role: mariadb

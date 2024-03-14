@@ -58,63 +58,64 @@ dovecot_mail:
 dovecot_auth:
   disable_plaintext_auth: true
 
+dovecot_acl:
+  plugins:
+    - acl: vfile:/etc/dovecot/global-acls:cache_secs=300
+    - acl_shared_dict: file:/srv/mail/%d/shared-mailboxes.db
 
-# dovecot_lmtp:
-#   protocols:
-#     - lmtp: {}
-#
-# dovecot_tcpwrapper:
-#   login_access_sockets: tcpwrap
-#   services: []
-#
-# dovecot_managesieve:
-#   service_count: 1
-#   process_min_avail: 0
-#   vsz_limit: 64M
-#   services: []
-#   protocols: []
-#
-#
-# dovecot_pop3:
-#   protocols:
-#     - pop3: {}
-#
-# dovecot_submission: {}
-#
-# dovecot_acl:
-#   plugins:
-#     # plugin {
-#     #   #acl: vfile:/etc/dovecot/global-acls:cache_secs=300
-#     # }
-#     - acl: vfile:/etc/dovecot/global-acls:cache_secs=300
-#     # plugin {
-#     #   #acl_shared_dict: file:/var/lib/dovecot/shared-mailboxes
-#     # }
-#     - acl_shared_dict: file:/var/lib/dovecot/shared-mailboxes
-#
-# dovecot_plugin:
-#   plugins: []
-#
-# dovecot_quota: {}
-#
-# dovecot_sieve_extprograms: {}
-#
-# dovecot_sieve:
-#   plugins: []
-#
-# dovecot_sql:
-#
-#   driver: sqlite
-#   connect: /etc/dovecot/authdb.sqlite
-#   default_pass_scheme: MD5
-#   password_query: >
-#       SELECT username, domain, password
-#       FROM users
-#       WHERE username: '%n' AND domain: '%d'
-#   user_query: >
-#     SELECT home, uid, gid
-#     FROM users
-#     WHERE username: '%n' AND domain: '%d'
-#   iterate_query: SELECT username AS user FROM users
+# Database related
+
+dovecot_authentications:
+  - sql:
+      passdb:
+        driver: sql
+        args: /etc/dovecot/dovecot-sql.conf.ext
+      userdb:
+        driver: sql
+        args: /etc/dovecot/dovecot-sql.conf.ext
+
+dovecot_sql:
+  driver: mysql
+  connects:
+    host: database
+    dbname: postfix
+    user: postfix
+    password: postfix
+  default_pass_scheme: CRAM-MD5
+  password_query: >
+    SELECT
+      password
+      FROM mailbox
+      WHERE username = '%u'
+  user_query: >
+    SELECT
+      '/srv/mail/%d/%n' as home,
+      CONCAT('maildir:/srv/mail/', maildir) AS mail,
+      1101 AS uid,
+      1101 AS gid
+      FROM mailbox
+      WHERE username = '%u'
+
+dovecot_dict_sql:
+  connects:
+    host: database
+    dbname: postfix
+    user: postfix
+    password: postfix
+  maps:
+    - pattern: priv/quota/storage
+      table: quota
+      username_field: username
+      value_field: bytes
+    - pattern: priv/quota/messages
+      table: quota
+      username_field: username
+      value_field: messages
+    - pattern: "shared/expire/$user/$mailbox"
+      table: expires
+      value_field: expire_stamp
+      fields:
+        username: $user
+        mailbox: $mailbox
 
 ...

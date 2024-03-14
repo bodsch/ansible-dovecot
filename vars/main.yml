@@ -533,6 +533,7 @@ dovecot_defaults_dict_auth:
 dovecot_defaults_dict_sql:
   connects:
     host: ""                                        # localhost
+    port: ""                                        #
     dbname: ""                                      # mails
     user: ""                                        # testuser
     password: ""                                    # pass
