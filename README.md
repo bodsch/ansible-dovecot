@@ -7,16 +7,27 @@ Ansible role to install and configure dovecot on various linux systems.
 [![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/bodsch/ansible-dovecot/main.yml?branch=main)][ci]
 [![GitHub issues](https://img.shields.io/github/issues/bodsch/ansible-dovecot)][issues]
 [![GitHub release (latest by date)](https://img.shields.io/github/v/release/bodsch/ansible-dovecot)][releases]
-[![Ansible Quality Score](https://img.shields.io/ansible/quality/50067?label=role%20quality)][quality]
+[![Ansible Downloads](https://img.shields.io/ansible/role/d/bodsch/dovecot?logo=ansible)][galaxy]
 
 [ci]: https://github.com/bodsch/ansible-dovecot/actions
 [issues]: https://github.com/bodsch/ansible-dovecot/issues?q=is%3Aopen+is%3Aissue
 [releases]: https://github.com/bodsch/ansible-dovecot/releases
-[quality]: https://galaxy.ansible.com/bodsch/dovecot
+[galaxy]: https://galaxy.ansible.com/ui/standalone/roles/bodsch/dovecot/
 
 
 ## Requirements & Dependencies
 
+Ansible Collections
+
+- [bodsch.core](https://github.com/bodsch/ansible-collection-core)
+
+```bash
+ansible-galaxy collection install bodsch.core
+```
+or
+```bash
+ansible-galaxy collection install --requirements-file collections.yml
+```
 
 ### Operating systems
 
@@ -24,8 +35,10 @@ Tested on
 
 * Arch Linux
 * Debian based
-    - Debian 10 / 11 / 12
+    - Debian 11 / 12
     - Ubuntu 20.04 / 22.04
+
+> **RedHat-based systems are no longer officially supported! May work, but does not have to.**
 
 ## configuration
 
@@ -85,4 +98,4 @@ If you want to use something stable, please use a [Tagged Version](https://githu
 
 [Apache](LICENSE)
 
-`FREE SOFTWARE, HELL YEAH!`
+**FREE SOFTWARE, HELL YEAH!**
